@@ -1,21 +1,28 @@
-'use client';
-
-import { useState } from 'react';
+import Link from 'next/link';
 import { Property } from '@/types/property';
+import { FilterType } from '@/lib/properties';
 import PropertyCard from './PropertyCard';
+import PaginationControls from './PaginationControls';
 
 interface MarketSectionProps {
   properties: Property[];
+  currentPage: number;
+  totalPages: number;
+  filter: FilterType;
 }
 
-export default function MarketSection({ properties }: MarketSectionProps) {
-  const [filter, setFilter] = useState<'All' | 'Buy' | 'Rent'>('All');
-
-  const filteredProperties = properties.filter((prop) => {
-    if (filter === 'Buy') return prop.listingType === 'FOR SALE';
-    if (filter === 'Rent') return prop.listingType === 'FOR RENT';
-    return true;
-  });
+export default function MarketSection({
+  properties,
+  currentPage,
+  totalPages,
+  filter,
+}: MarketSectionProps) {
+  function filterHref(tab: FilterType) {
+    const params = new URLSearchParams();
+    if (tab !== 'All') params.set('filter', tab);
+    params.set('page', '1');
+    return `/?${params.toString()}`;
+  }
 
   return (
     <section>
@@ -28,40 +35,48 @@ export default function MarketSection({ properties }: MarketSectionProps) {
             Fresh opportunities added this week.
           </p>
         </div>
+
+        {/* Filter tabs — Server-side navigation via Link */}
         <div className="hidden md:flex bg-white p-1 rounded-lg">
-          {(['All', 'Buy', 'Rent'] as const).map((tab) => {
+          {(['All', 'Buy', 'Rent'] as FilterType[]).map((tab) => {
             const isActive = filter === tab;
-            return (
-              <button
+            return isActive ? (
+              <span
                 key={tab}
-                onClick={() => setFilter(tab)}
-                className={
-                  isActive
-                    ? 'px-4 py-1.5 rounded-md text-sm font-medium bg-nordic-dark text-white shadow-sm cursor-pointer transition-all'
-                    : 'px-4 py-1.5 rounded-md text-sm font-medium text-nordic-muted hover:text-nordic-dark cursor-pointer transition-all'
-                }
+                className="px-4 py-1.5 rounded-md text-sm font-medium bg-nordic-dark text-white shadow-sm"
               >
                 {tab}
-              </button>
+              </span>
+            ) : (
+              <Link
+                key={tab}
+                href={filterHref(tab)}
+                className="px-4 py-1.5 rounded-md text-sm font-medium text-nordic-muted hover:text-nordic-dark transition-all"
+              >
+                {tab}
+              </Link>
             );
           })}
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredProperties.map((property) => (
-          <PropertyCard key={property.id} property={property} />
-        ))}
+        {properties.length > 0 ? (
+          properties.map((property) => (
+            <PropertyCard key={property.id} property={property} />
+          ))
+        ) : (
+          <p className="col-span-full text-center text-nordic-muted py-16 text-sm">
+            No properties found for this filter.
+          </p>
+        )}
       </div>
 
-      <div className="mt-12 text-center">
-        <button
-          type="button"
-          className="px-8 py-3 bg-white border border-nordic-dark/10 hover:border-mosque hover:text-mosque text-nordic-dark font-medium rounded-lg transition-all hover:shadow-md cursor-pointer"
-        >
-          Load more properties
-        </button>
-      </div>
+      <PaginationControls
+        currentPage={currentPage}
+        totalPages={totalPages}
+        filter={filter}
+      />
     </section>
   );
 }
