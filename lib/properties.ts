@@ -24,14 +24,15 @@ function mapRow(row: Record<string, unknown>): Property {
     beds: Number(row.beds),
     baths: Number(row.baths),
     area: row.area as string,
-    image: row.image as string,
+    images: (Array.isArray(row.images) && row.images.length > 0)
+      ? (row.images as string[])
+      : ['/placeholder.jpg'],
     imageAlt: row.image_alt as string | undefined,
     badge: row.badge as string | undefined,
     listingType: row.listing_type as PropertyListingType,
     category: row.category as PropertyCategory,
     isFeatured: Boolean(row.is_featured),
     slug: (row.slug as string | undefined) || (row.id as string),
-    images: row.images as string[] | undefined,
     description: row.description as string | undefined,
     amenities: row.amenities as string[] | undefined,
   };

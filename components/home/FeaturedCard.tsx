@@ -22,7 +22,7 @@ export default function FeaturedCard({ property }: FeaturedCardProps) {
         <img
           alt={property.imageAlt || property.title}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          src={property.image}
+          src={property.images?.[0] || '/placeholder.jpg'}
         />
         {property.badge && (
           <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider text-nordic-dark">

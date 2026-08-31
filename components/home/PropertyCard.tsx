@@ -28,7 +28,7 @@ export default function PropertyCard({ property, className = '' }: PropertyCardP
         <img
           alt={property.imageAlt || property.title}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-          src={property.image}
+          src={property.images?.[0] || '/placeholder.jpg'}
         />
         <button
           onClick={toggleFavorite}

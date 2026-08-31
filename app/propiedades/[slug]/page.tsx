@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: PropertyPageProps): Promise<M
     openGraph: {
       title,
       description,
-      images: [{ url: property.image }],
+      images: [{ url: property.images?.[0] || '/placeholder.jpg' }],
     },
   };
 }
@@ -47,7 +47,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
 
   const galleryImages = property.images && property.images.length > 0 
     ? property.images 
-    : [property.image];
+    : ['/placeholder.jpg'];
 
   // Mock lat/lng for map - you can add real fields to DB later
   const lat = 37.4419;

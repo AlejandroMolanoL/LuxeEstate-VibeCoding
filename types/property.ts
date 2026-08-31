@@ -13,8 +13,7 @@ export interface Property {
   beds: number;
   baths: number;
   area: string; // e.g. "4,200 m²" or "120m²"
-  image: string;
-  images?: string[];
+  images: string[];
   imageAlt?: string;
   badge?: string; // e.g. "Exclusive", "New Arrival"
   listingType: PropertyListingType;
