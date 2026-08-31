@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Property } from '@/types/property';
 
 interface PropertyCardProps {
@@ -19,8 +20,9 @@ export default function PropertyCard({ property, className = '' }: PropertyCardP
   const isForSale = property.listingType === 'FOR SALE';
 
   return (
-    <article
-      className={`bg-white rounded-xl overflow-hidden shadow-card hover:shadow-soft transition-all duration-300 group cursor-pointer h-full flex flex-col ${className}`}
+    <Link
+      href={property.slug ? `/propiedades/${property.slug}` : '#'}
+      className={`bg-white rounded-xl overflow-hidden shadow-card hover:shadow-soft transition-all duration-300 group cursor-pointer h-full flex flex-col block ${className}`}
     >
       <div className="relative aspect-[4/3] overflow-hidden">
         <img
@@ -81,6 +83,6 @@ export default function PropertyCard({ property, className = '' }: PropertyCardP
           </div>
         </div>
       </div>
-    </article>
+    </Link>
   );
 }

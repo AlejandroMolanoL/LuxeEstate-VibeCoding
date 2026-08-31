@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Property } from '@/types/property';
 
 interface FeaturedCardProps {
@@ -16,7 +17,7 @@ export default function FeaturedCard({ property }: FeaturedCardProps) {
   };
 
   return (
-    <div className="group relative rounded-xl overflow-hidden shadow-soft bg-white cursor-pointer">
+    <Link href={property.slug ? `/propiedades/${property.slug}` : '#'} className="group relative rounded-xl overflow-hidden shadow-soft bg-white cursor-pointer block">
       <div className="aspect-[4/3] w-full overflow-hidden relative">
         <img
           alt={property.imageAlt || property.title}
@@ -71,6 +72,6 @@ export default function FeaturedCard({ property }: FeaturedCardProps) {
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

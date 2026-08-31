@@ -30,6 +30,10 @@ function mapRow(row: Record<string, unknown>): Property {
     listingType: row.listing_type as PropertyListingType,
     category: row.category as PropertyCategory,
     isFeatured: Boolean(row.is_featured),
+    slug: (row.slug as string | undefined) || (row.id as string),
+    images: row.images as string[] | undefined,
+    description: row.description as string | undefined,
+    amenities: row.amenities as string[] | undefined,
   };
 }
 
@@ -82,4 +86,37 @@ export async function getFeaturedProperties(): Promise<Property[]> {
   }
 
   return (data ?? []).map(mapRow);
+}
+
+export async function getPropertyBySlug(slug: string): Promise<Property | null> {
+  const { data, error } = await supabase
+    .from('properties')
+    .select('*')
+    .eq('slug', slug)
+    .single();
+
+  if (error) {
+    // 42703: column does not exist (meaning migration hasn't run yet)
+    if (error.code === '42703') {
+      const { data: fallbackData, error: fallbackError } = await supabase
+        .from('properties')
+        .select('*')
+        .eq('id', slug)
+        .single();
+        
+      if (!fallbackError && fallbackData) {
+        return mapRow(fallbackData);
+      }
+      return null;
+    }
+    
+    if (error.code !== 'PGRST116') { // PGRST116 is "Results contain 0 rows"
+      console.error('Error fetching property by slug:', error.message);
+    }
+    return null;
+  }
+
+  if (!data) return null;
+
+  return mapRow(data);
 }
