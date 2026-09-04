@@ -9,6 +9,7 @@ interface PropertyContactProps {
   agentImage?: string;
   propertyTitle: string;
   propertyId: string;
+  dictionary?: any;
 }
 
 export default function PropertyContact({
@@ -18,10 +19,12 @@ export default function PropertyContact({
   agentImage = 'https://lh3.googleusercontent.com/aida-public/AB6AXuD4TxUmdQRb2VMjuaNxLEwLorv_dgHzoET2_wL5toSvew6nhtziaR3DX-U69DBN7J74yO6oKokpw8tqEFutJf13MeXghCy7FwZuAxnoJel6FYcKeCRUVinpZtrNnkZvXd-MY5_2MAtRD7JP5BieHixfCaeAPW04jm-y-nvF3HIrwcZ_HRDk_MrNP5WiPV3u9zNrEgM-SQoWGh4xLVSV444aZAbVl03mjjsW5WBpIeodCyqJxprTDp6Q157D06VxcdUSCf-l9UKQT-w',
   propertyTitle,
   propertyId,
+  dictionary,
 }: PropertyContactProps) {
 
   const handleWhatsApp = () => {
-    const text = `Hola, me interesa la propiedad ${propertyTitle} (Ref: ${propertyId})`;
+    const messageTemplate = dictionary?.contact_form?.whatsapp_message || 'Hola, me interesa la propiedad';
+    const text = `${messageTemplate} ${propertyTitle} (Ref: ${propertyId})`;
     const encodedText = encodeURIComponent(text);
     // You would replace this with actual agent's number
     window.open(`https://wa.me/1234567890?text=${encodedText}`, '_blank');
@@ -54,14 +57,14 @@ export default function PropertyContact({
           <h3 className="font-semibold text-nordic">{agentName}</h3>
           <div className="flex items-center gap-1 text-xs text-mosque font-medium">
             <span className="material-icons text-[14px]">star</span>
-            <span>Top Rated Agent</span>
+            <span>{dictionary?.contact_form?.top_rated_agent || "Top Rated Agent"}</span>
           </div>
         </div>
         <div className="ml-auto flex gap-2">
-          <button className="p-2 rounded-full bg-mosque/10 text-mosque hover:bg-mosque hover:text-white transition-colors" title="Chat">
+          <button className="p-2 rounded-full bg-mosque/10 text-mosque hover:bg-mosque hover:text-white transition-colors" title={dictionary?.contact_form?.chat || "Chat"}>
             <span className="material-icons text-sm">chat</span>
           </button>
-          <button className="p-2 rounded-full bg-mosque/10 text-mosque hover:bg-mosque hover:text-white transition-colors" title="Call">
+          <button className="p-2 rounded-full bg-mosque/10 text-mosque hover:bg-mosque hover:text-white transition-colors" title={dictionary?.contact_form?.call || "Call"}>
             <span className="material-icons text-sm">call</span>
           </button>
         </div>
@@ -70,14 +73,14 @@ export default function PropertyContact({
       <div className="space-y-3">
         <button className="w-full bg-mosque hover:bg-primary-hover text-white py-4 px-6 rounded-lg font-medium transition-all shadow-lg shadow-mosque/20 flex items-center justify-center gap-2 group">
           <span className="material-icons text-xl group-hover:scale-110 transition-transform">calendar_today</span>
-          Schedule Visit
+          {dictionary?.contact_form?.schedule_tour || "Schedule Visit"}
         </button>
         <button 
           onClick={handleWhatsApp}
           className="w-full bg-transparent border border-nordic/10 hover:border-mosque text-nordic/80 hover:text-mosque py-4 px-6 rounded-lg font-medium transition-all flex items-center justify-center gap-2"
         >
           <span className="material-icons text-xl text-green-500">chat</span>
-          WhatsApp Agent
+          {dictionary?.contact_form?.whatsapp_agent || "WhatsApp Agent"}
         </button>
       </div>
     </div>

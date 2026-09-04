@@ -16,9 +16,10 @@ interface PropertyMapProps {
   // Fallback coordinates (e.g. Palo Alto)
   lat?: number;
   lng?: number;
+  dictionary?: any;
 }
 
-export default function PropertyMap({ address, lat = 37.4419, lng = -122.1430 }: PropertyMapProps) {
+export default function PropertyMap({ address, lat = 37.4419, lng = -122.1430, dictionary }: PropertyMapProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -40,7 +41,7 @@ export default function PropertyMap({ address, lat = 37.4419, lng = -122.1430 }:
     return (
       <div className="bg-white p-2 rounded-xl shadow-sm border border-mosque/5">
         <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center">
-          <span className="text-nordic/50">Loading map...</span>
+          <span className="text-nordic/50">{dictionary?.map?.loading_map || "Loading map..."}</span>
         </div>
       </div>
     );
@@ -61,7 +62,7 @@ export default function PropertyMap({ address, lat = 37.4419, lng = -122.1430 }:
           </Marker>
         </MapContainer>
         <a className="absolute bottom-2 right-2 bg-white/90 text-xs font-medium px-2 py-1 rounded shadow-sm text-nordic hover:text-mosque z-[1000]" href={`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`} target="_blank" rel="noreferrer">
-          View on Google Maps
+          {dictionary?.map?.view_on_maps || "View on Google Maps"}
         </a>
       </div>
     </div>

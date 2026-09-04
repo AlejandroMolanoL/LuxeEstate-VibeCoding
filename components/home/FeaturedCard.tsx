@@ -6,15 +6,19 @@ import { Property } from '@/types/property';
 
 interface FeaturedCardProps {
   property: Property;
+  dictionary?: any;
 }
 
-export default function FeaturedCard({ property }: FeaturedCardProps) {
+export default function FeaturedCard({ property, dictionary }: FeaturedCardProps) {
   const [isFavorite, setIsFavorite] = useState(false);
 
   const toggleFavorite = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsFavorite(!isFavorite);
   };
+
+  const badgeKey = property.badge ? `badge_${property.badge.toLowerCase().replace(/\s+/g, '_')}` : '';
+  const translatedBadge = property.badge ? (dictionary?.property_details?.[badgeKey] || property.badge) : '';
 
   return (
     <Link href={property.slug ? `/propiedades/${property.slug}` : '#'} className="group relative rounded-xl overflow-hidden shadow-soft bg-white cursor-pointer block">
@@ -26,7 +30,7 @@ export default function FeaturedCard({ property }: FeaturedCardProps) {
         />
         {property.badge && (
           <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider text-nordic-dark">
-            {property.badge}
+            {translatedBadge}
           </div>
         )}
         <button
@@ -62,10 +66,10 @@ export default function FeaturedCard({ property }: FeaturedCardProps) {
         </div>
         <div className="flex items-center gap-6 mt-6 pt-6 border-t border-nordic-dark/5">
           <div className="flex items-center gap-2 text-nordic-muted text-sm">
-            <span className="material-icons text-lg">king_bed</span> {property.beds} Beds
+            <span className="material-icons text-lg">king_bed</span> {property.beds} {dictionary?.property_card?.beds || "Beds"}
           </div>
           <div className="flex items-center gap-2 text-nordic-muted text-sm">
-            <span className="material-icons text-lg">bathtub</span> {property.baths} Baths
+            <span className="material-icons text-lg">bathtub</span> {property.baths} {dictionary?.property_card?.baths || "Baths"}
           </div>
           <div className="flex items-center gap-2 text-nordic-muted text-sm">
             <span className="material-icons text-lg">square_foot</span> {property.area}

@@ -8,14 +8,27 @@ interface PropertyGalleryProps {
   title: string;
   badge?: string;
   listingType: string;
+  dictionary?: any;
 }
 
-export default function PropertyGallery({ images, title, badge, listingType }: PropertyGalleryProps) {
+export default function PropertyGallery({ images, title, badge, listingType, dictionary }: PropertyGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   // If no images are provided, use a placeholder
   const displayImages = images && images.length > 0 ? images : ['/placeholder.jpg'];
   const mainImage = displayImages[activeIndex];
+  
+  // Translate listingType (FOR SALE, FOR RENT) using dictionary
+  const isForSale = listingType?.toUpperCase() === 'FOR SALE' || listingType?.toLowerCase() === 'sale' || listingType?.toLowerCase() === 'buy';
+  const isForRent = listingType?.toUpperCase() === 'FOR RENT' || listingType?.toLowerCase() === 'rent';
+  const translatedListingType = isForSale 
+    ? (dictionary?.property_card?.for_sale || 'FOR SALE') 
+    : isForRent 
+      ? (dictionary?.property_card?.for_rent || 'FOR RENT') 
+      : (dictionary?.market?.tabs?.[listingType] || listingType);
+
+  const badgeKey = badge ? `badge_${badge.toLowerCase().replace(/\s+/g, '_')}` : '';
+  const translatedBadge = badge ? (dictionary?.property_details?.[badgeKey] || badge) : '';
 
   return (
     <div className="space-y-4">
@@ -32,18 +45,18 @@ export default function PropertyGallery({ images, title, badge, listingType }: P
         <div className="absolute top-4 left-4 flex gap-2">
           {badge && (
             <span className="bg-mosque text-white text-xs font-medium px-3 py-1.5 rounded-full uppercase tracking-wider shadow-sm">
-              {badge}
+              {translatedBadge}
             </span>
           )}
           <span className="bg-white/90 backdrop-blur text-nordic text-xs font-medium px-3 py-1.5 rounded-full uppercase tracking-wider shadow-sm">
-            {listingType}
+            {translatedListingType}
           </span>
         </div>
         
         {displayImages.length > 1 && (
           <button className="absolute bottom-4 right-4 bg-white/90 hover:bg-white text-nordic px-4 py-2 rounded-lg text-sm font-medium shadow-lg backdrop-blur transition-all flex items-center gap-2">
             <span className="material-icons text-sm">grid_view</span>
-            View All Photos ({displayImages.length})
+            {dictionary?.property_details?.view_all_photos || "View All Photos"} ({displayImages.length})
           </button>
         )}
       </div>

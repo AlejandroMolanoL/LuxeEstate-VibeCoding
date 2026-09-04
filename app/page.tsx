@@ -3,6 +3,7 @@ import HeroSearch from '@/components/home/HeroSearch';
 import FeaturedCollections from '@/components/home/FeaturedCollections';
 import MarketSection from '@/components/home/MarketSection';
 import { getProperties, getFeaturedProperties, FilterType, AdvancedFilters } from '@/lib/properties';
+import { getLocale, getDictionary } from '@/lib/i18n';
 
 interface HomeProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -10,6 +11,9 @@ interface HomeProps {
 
 export default async function Home({ searchParams }: HomeProps) {
   const { page: pageParam, filter: filterParam } = await searchParams;
+
+  const locale = await getLocale();
+  const dictionary = await getDictionary(locale);
 
   const page = Math.max(1, Number(pageParam) || 1);
 
@@ -49,15 +53,16 @@ export default async function Home({ searchParams }: HomeProps) {
 
   return (
     <div className="min-h-screen bg-background-light text-nordic-dark font-display antialiased">
-      <Navbar />
+      <Navbar dictionary={dictionary.navbar} currentLocale={locale} />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-        <HeroSearch />
-        {displayFeatured.length > 0 && <FeaturedCollections properties={displayFeatured} />}
+        <HeroSearch dictionary={dictionary} />
+        {displayFeatured.length > 0 && <FeaturedCollections properties={displayFeatured} dictionary={dictionary} />}
         <MarketSection
           properties={market.data}
           currentPage={page}
           totalPages={market.totalPages}
           filter={filterType}
+          dictionary={dictionary}
         />
       </main>
     </div>

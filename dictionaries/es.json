@@ -1,0 +1,141 @@
+{
+  "navbar": {
+    "buy": "Comprar",
+    "rent": "Alquilar",
+    "sell": "Vender",
+    "saved_homes": "Guardados"
+  },
+  "hero": {
+    "title_start": "Encuentra tu",
+    "title_highlight": "santuario",
+    "search_placeholder": "Buscar por ciudad, barrio o dirección...",
+    "search_button": "Buscar",
+    "categories": {
+      "All": "Todos",
+      "House": "Casa",
+      "Apartment": "Apartamento",
+      "Villa": "Villa",
+      "Penthouse": "Ático"
+    },
+    "filters_button": "Filtros"
+  },
+  "filters": {
+    "title": "Filtros",
+    "location": "Ubicación",
+    "location_placeholder": "Ciudad, barrio o dirección",
+    "price_range": "Rango de Precio",
+    "min_price": "Precio Mín",
+    "max_price": "Precio Máx",
+    "property_type": "Tipo de Propiedad",
+    "property_types": {
+      "Any Type": "Cualquier Tipo",
+      "House": "Casa",
+      "Apartment": "Apartamento",
+      "Condo": "Condominio",
+      "Townhouse": "Adosado",
+      "Villa": "Villa",
+      "Penthouse": "Ático"
+    },
+    "bedrooms": "Dormitorios",
+    "bathrooms": "Baños",
+    "any": "Cualquiera",
+    "amenities": "Comodidades y Características",
+    "amenity_list": {
+      "Swimming Pool": "Piscina",
+      "Gym": "Gimnasio",
+      "Parking": "Estacionamiento",
+      "Air Conditioning": "Aire Acondicionado",
+      "High-speed Wifi": "Wifi de alta velocidad",
+      "Patio / Terrace": "Patio / Terraza"
+    },
+    "clear_all": "Borrar todos los filtros",
+    "show_homes": "Mostrar Propiedades"
+  },
+  "market": {
+    "title": "Nuevo en el Mercado",
+    "subtitle": "Nuevas oportunidades agregadas esta semana.",
+    "tabs": {
+      "All": "Todos",
+      "Buy": "Comprar",
+      "Rent": "Alquilar"
+    },
+    "no_properties": "No se encontraron propiedades para este filtro.",
+    "pagination": {
+      "prev": "Ant",
+      "next": "Sig"
+    }
+  },
+  "featured": {
+    "title": "Colecciones Destacadas",
+    "subtitle": "Propiedades curadas para los más exigentes.",
+    "view_all": "Ver todas"
+  },
+  "property_card": {
+    "beds": "Camas",
+    "baths": "Baños",
+    "for_sale": "EN VENTA",
+    "for_rent": "EN ALQUILER",
+    "per_month": "/mes"
+  },
+  "property_details": {
+    "features_title": "Características de la Propiedad",
+    "square_area": "Área",
+    "bedrooms": "Dormitorios",
+    "bathrooms": "Baños",
+    "garage": "Garaje",
+    "about_title": "Acerca de esta casa",
+    "amenities_title": "Comodidades",
+    "view_all_photos": "Ver todas las fotos",
+    "badge_featured": "Destacada",
+    "badge_new": "Nueva",
+    "badge_exclusive": "Exclusiva",
+    "badge_new_arrival": "Recién Llegada",
+    "badge_hot_deal": "Oferta Especial",
+    "badge_luxury": "Lujo",
+    "badge_for_sale": "En Venta",
+    "badge_for_rent": "En Alquiler",
+    "default_description": "Experimente el lujo moderno en esta impresionante residencia arquitectónica ubicada en {location}. Diseñada con énfasis en la vida interior-exterior, la residencia cuenta con paredes de cristal del piso al techo que inundan los interiores con luz natural.",
+    "footer_rights": "© 2023 LuxeEstate Inc. Todos los derechos reservados."
+  },
+  "detail_amenities": {
+    "Smart Home System": "Sistema de Hogar Inteligente",
+    "Swimming Pool": "Piscina",
+    "Central Heating & Cooling": "Calefacción y Refrigeración Central",
+    "Electric Vehicle Charging": "Carga para Vehículos Eléctricos",
+    "Private Gym": "Gimnasio Privado",
+    "Wine Cellar": "Bodega de Vinos",
+    "Home Theater": "Cine en Casa",
+    "Rooftop Terrace": "Terraza en la Azotea",
+    "Garden": "Jardín",
+    "Security System": "Sistema de Seguridad",
+    "Spa": "Spa",
+    "Fireplace": "Chimenea"
+  },
+  "mortgage_calculator": {
+    "title": "Pago Estimado",
+    "starting_from": "A partir de",
+    "with_down": "con 20% de pago inicial",
+    "calculate": "Calcular Hipoteca"
+  },
+  "contact_form": {
+    "title": "¿Interesado en esta propiedad?",
+    "contact_agent": "Contactar Agente",
+    "schedule_tour": "Programar Visita",
+    "your_name": "Tu Nombre",
+    "email_address": "Correo Electrónico",
+    "phone_number": "Número de Teléfono",
+    "message": "Mensaje",
+    "send_message": "Enviar Mensaje",
+    "top_rated_agent": "Agente Destacado",
+    "chat": "Chat",
+    "call": "Llamar",
+    "whatsapp_agent": "WhatsApp al Agente",
+    "whatsapp_message": "Hola, me interesa la propiedad"
+  },
+  "map": {
+    "location": "Ubicación",
+    "not_available": "Vista del mapa no disponible para",
+    "loading_map": "Cargando mapa...",
+    "view_on_maps": "Ver en Google Maps"
+  }
+}

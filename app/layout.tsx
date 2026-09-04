@@ -1,18 +1,21 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { getLocale } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Luxe Estate - Premium Real Estate",
   description: "Find your sanctuary. Discover luxury homes, apartments, and exclusive properties.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+
   return (
-    <html lang="en" className="h-full">
+    <html lang={locale} className="h-full">
       <head>
         <link
           rel="preconnect"

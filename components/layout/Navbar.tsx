@@ -1,24 +1,63 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface NavbarProps {
   activeTab?: string;
   onTabChange?: (tab: string) => void;
+  dictionary?: any;
+  currentLocale?: string;
 }
 
-export default function Navbar({ activeTab = 'Buy', onTabChange }: NavbarProps) {
+export default function Navbar({ activeTab = 'Buy', onTabChange, dictionary, currentLocale = 'es' }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [currentTab, setCurrentTab] = useState(activeTab);
+  const router = useRouter();
+  const langMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close language menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (langMenuRef.current && !langMenuRef.current.contains(event.target as Node)) {
+        setIsLangMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const navItems = ['Buy', 'Rent', 'Sell', 'Saved Homes'];
+
+  const getTranslatedItem = (item: string) => {
+    if (!dictionary) return item;
+    switch (item) {
+      case 'Buy': return dictionary.buy;
+      case 'Rent': return dictionary.rent;
+      case 'Sell': return dictionary.sell;
+      case 'Saved Homes': return dictionary.saved_homes;
+      default: return item;
+    }
+  };
 
   const handleTabClick = (item: string) => {
     setCurrentTab(item);
     if (onTabChange) {
       onTabChange(item);
     }
+  };
+
+  const handleLanguageChange = (newLocale: string) => {
+    document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000`;
+    window.location.reload();
+  };
+
+  const flags = {
+    es: "https://flagcdn.com/w20/es.png",
+    en: "https://flagcdn.com/w20/us.png",
+    fr: "https://flagcdn.com/w20/fr.png"
   };
 
   return (
@@ -49,7 +88,7 @@ export default function Navbar({ activeTab = 'Buy', onTabChange }: NavbarProps) 
                       : 'text-nordic-dark/70 hover:text-nordic-dark font-medium text-sm hover:border-b-2 hover:border-nordic-dark/20 px-1 py-1 transition-all'
                   }
                 >
-                  {item}
+                  {getTranslatedItem(item)}
                 </button>
               );
             })}
@@ -57,6 +96,45 @@ export default function Navbar({ activeTab = 'Buy', onTabChange }: NavbarProps) 
 
           {/* Header Action Icons */}
           <div className="flex items-center space-x-4 md:space-x-6">
+            {/* Custom Language Selector */}
+            <div className="relative" ref={langMenuRef}>
+              <button 
+                onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
+                className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
+                aria-label="Select language"
+              >
+                <img 
+                  src={flags[currentLocale as keyof typeof flags] || flags.es} 
+                  alt={currentLocale} 
+                  className="w-5 h-auto rounded-[2px] shadow-sm"
+                />
+                <span className="text-sm font-medium text-nordic-dark uppercase">{currentLocale}</span>
+                <span className="material-icons text-nordic-dark/70 text-[16px]">expand_more</span>
+              </button>
+              
+              {isLangMenuOpen && (
+                <div className="absolute top-full mt-2 right-0 bg-white border border-mosque/10 shadow-lg rounded-xl overflow-hidden z-50 w-24 py-1">
+                  {(['es', 'en', 'fr'] as const).map(lang => (
+                    <button 
+                      key={lang} 
+                      onClick={() => { 
+                        handleLanguageChange(lang); 
+                        setIsLangMenuOpen(false); 
+                      }} 
+                      className={`flex items-center gap-2 px-4 py-2 hover:bg-mosque/5 w-full text-left transition-colors ${currentLocale === lang ? 'bg-mosque/5 text-mosque' : 'text-nordic-dark'}`}
+                    >
+                      <img 
+                        src={flags[lang]} 
+                        alt={lang} 
+                        className="w-5 h-auto rounded-[2px] shadow-sm"
+                      />
+                      <span className="text-sm font-medium uppercase">{lang}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <button
               aria-label="Search"
               className="text-nordic-dark hover:text-mosque transition-colors"
@@ -110,7 +188,7 @@ export default function Navbar({ activeTab = 'Buy', onTabChange }: NavbarProps) 
                     : 'text-nordic-dark hover:bg-black/5'
                 }`}
               >
-                {item}
+                {getTranslatedItem(item)}
               </button>
             );
           })}

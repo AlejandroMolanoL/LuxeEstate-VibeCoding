@@ -7,9 +7,10 @@ import { Property } from '@/types/property';
 interface PropertyCardProps {
   property: Property;
   className?: string;
+  dictionary?: any;
 }
 
-export default function PropertyCard({ property, className = '' }: PropertyCardProps) {
+export default function PropertyCard({ property, className = '', dictionary }: PropertyCardProps) {
   const [isFavorite, setIsFavorite] = useState(false);
 
   const toggleFavorite = (e: React.MouseEvent) => {
@@ -17,7 +18,10 @@ export default function PropertyCard({ property, className = '' }: PropertyCardP
     setIsFavorite(!isFavorite);
   };
 
-  const isForSale = property.listingType === 'FOR SALE';
+  const isForSale = property.listingType?.toUpperCase() === 'FOR SALE' || property.listingType?.toLowerCase() === 'sale' || property.listingType?.toLowerCase() === 'buy';
+  const displayListingType = isForSale 
+    ? (dictionary?.property_card?.for_sale || 'FOR SALE') 
+    : (dictionary?.property_card?.for_rent || 'FOR RENT');
 
   return (
     <Link
@@ -48,7 +52,7 @@ export default function PropertyCard({ property, className = '' }: PropertyCardP
             isForSale ? 'bg-nordic-dark/90' : 'bg-mosque/90'
           }`}
         >
-          {property.listingType}
+          {displayListingType}
         </div>
       </div>
       <div className="p-4 flex flex-col flex-grow">
@@ -57,7 +61,7 @@ export default function PropertyCard({ property, className = '' }: PropertyCardP
             {property.formattedPrice || `$${property.price.toLocaleString()}`}
             {property.pricePeriod && (
               <span className="text-sm font-normal text-nordic-muted">
-                {property.pricePeriod}
+                {dictionary?.property_card?.per_month || property.pricePeriod}
               </span>
             )}
           </h3>

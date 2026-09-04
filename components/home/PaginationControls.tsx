@@ -5,12 +5,14 @@ interface PaginationControlsProps {
   currentPage: number;
   totalPages: number;
   filter: FilterType;
+  dictionary?: any;
 }
 
 export default function PaginationControls({
   currentPage,
   totalPages,
   filter,
+  dictionary,
 }: PaginationControlsProps) {
   if (totalPages <= 1) return null;
 
@@ -40,12 +42,12 @@ export default function PaginationControls({
           aria-label="Previous page"
         >
           <span className="material-icons text-base">chevron_left</span>
-          Prev
+          {dictionary?.market?.pagination?.prev || "Prev"}
         </Link>
       ) : (
         <span className="flex items-center gap-1 px-4 py-2 bg-white border border-nordic-dark/5 text-nordic-muted/40 text-sm font-medium rounded-lg cursor-not-allowed select-none">
           <span className="material-icons text-base">chevron_left</span>
-          Prev
+          {dictionary?.market?.pagination?.prev || "Prev"}
         </span>
       )}
 
@@ -110,12 +112,12 @@ export default function PaginationControls({
           className="flex items-center gap-1 px-4 py-2 bg-white border border-nordic-dark/10 hover:border-mosque hover:text-mosque text-nordic-dark text-sm font-medium rounded-lg transition-all hover:shadow-md"
           aria-label="Next page"
         >
-          Next
+          {dictionary?.market?.pagination?.next || "Next"}
           <span className="material-icons text-base">chevron_right</span>
         </Link>
       ) : (
         <span className="flex items-center gap-1 px-4 py-2 bg-white border border-nordic-dark/5 text-nordic-muted/40 text-sm font-medium rounded-lg cursor-not-allowed select-none">
-          Next
+          {dictionary?.market?.pagination?.next || "Next"}
           <span className="material-icons text-base">chevron_right</span>
         </span>
       )}

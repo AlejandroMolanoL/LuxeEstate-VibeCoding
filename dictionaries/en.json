@@ -1,0 +1,141 @@
+{
+  "navbar": {
+    "buy": "Buy",
+    "rent": "Rent",
+    "sell": "Sell",
+    "saved_homes": "Saved Homes"
+  },
+  "hero": {
+    "title_start": "Find your",
+    "title_highlight": "sanctuary",
+    "search_placeholder": "Search by city, neighborhood, or address...",
+    "search_button": "Search",
+    "categories": {
+      "All": "All",
+      "House": "House",
+      "Apartment": "Apartment",
+      "Villa": "Villa",
+      "Penthouse": "Penthouse"
+    },
+    "filters_button": "Filters"
+  },
+  "filters": {
+    "title": "Filters",
+    "location": "Location",
+    "location_placeholder": "City, neighborhood, or address",
+    "price_range": "Price Range",
+    "min_price": "Min Price",
+    "max_price": "Max Price",
+    "property_type": "Property Type",
+    "property_types": {
+      "Any Type": "Any Type",
+      "House": "House",
+      "Apartment": "Apartment",
+      "Condo": "Condo",
+      "Townhouse": "Townhouse",
+      "Villa": "Villa",
+      "Penthouse": "Penthouse"
+    },
+    "bedrooms": "Bedrooms",
+    "bathrooms": "Bathrooms",
+    "any": "Any",
+    "amenities": "Amenities & Features",
+    "amenity_list": {
+      "Swimming Pool": "Swimming Pool",
+      "Gym": "Gym",
+      "Parking": "Parking",
+      "Air Conditioning": "Air Conditioning",
+      "High-speed Wifi": "High-speed Wifi",
+      "Patio / Terrace": "Patio / Terrace"
+    },
+    "clear_all": "Clear all filters",
+    "show_homes": "Show Homes"
+  },
+  "market": {
+    "title": "New in Market",
+    "subtitle": "Fresh opportunities added this week.",
+    "tabs": {
+      "All": "All",
+      "Buy": "Buy",
+      "Rent": "Rent"
+    },
+    "no_properties": "No properties found for this filter.",
+    "pagination": {
+      "prev": "Prev",
+      "next": "Next"
+    }
+  },
+  "featured": {
+    "title": "Featured Collections",
+    "subtitle": "Curated properties for the discerning eye.",
+    "view_all": "View all"
+  },
+  "property_card": {
+    "beds": "Beds",
+    "baths": "Baths",
+    "for_sale": "FOR SALE",
+    "for_rent": "FOR RENT",
+    "per_month": "/mo"
+  },
+  "property_details": {
+    "features_title": "Property Features",
+    "square_area": "Square Area",
+    "bedrooms": "Bedrooms",
+    "bathrooms": "Bathrooms",
+    "garage": "Garage",
+    "about_title": "About this home",
+    "amenities_title": "Amenities",
+    "view_all_photos": "View All Photos",
+    "badge_featured": "Featured",
+    "badge_new": "New",
+    "badge_exclusive": "Exclusive",
+    "badge_new_arrival": "New Arrival",
+    "badge_hot_deal": "Hot Deal",
+    "badge_luxury": "Luxury",
+    "badge_for_sale": "For Sale",
+    "badge_for_rent": "For Rent",
+    "default_description": "Experience modern luxury in this architecturally stunning home located in {location}. Designed with an emphasis on indoor-outdoor living, the residence features floor-to-ceiling glass walls that flood the interiors with natural light.",
+    "footer_rights": "© 2023 LuxeEstate Inc. All rights reserved."
+  },
+  "detail_amenities": {
+    "Smart Home System": "Smart Home System",
+    "Swimming Pool": "Swimming Pool",
+    "Central Heating & Cooling": "Central Heating & Cooling",
+    "Electric Vehicle Charging": "Electric Vehicle Charging",
+    "Private Gym": "Private Gym",
+    "Wine Cellar": "Wine Cellar",
+    "Home Theater": "Home Theater",
+    "Rooftop Terrace": "Rooftop Terrace",
+    "Garden": "Garden",
+    "Security System": "Security System",
+    "Spa": "Spa",
+    "Fireplace": "Fireplace"
+  },
+  "mortgage_calculator": {
+    "title": "Estimated Payment",
+    "starting_from": "Starting from",
+    "with_down": "with 20% down",
+    "calculate": "Calculate Mortgage"
+  },
+  "contact_form": {
+    "title": "Interested in this property?",
+    "contact_agent": "Contact Agent",
+    "schedule_tour": "Schedule Visit",
+    "your_name": "Your Name",
+    "email_address": "Email Address",
+    "phone_number": "Phone Number",
+    "message": "Message",
+    "send_message": "Send Message",
+    "top_rated_agent": "Top Rated Agent",
+    "chat": "Chat",
+    "call": "Call",
+    "whatsapp_agent": "WhatsApp Agent",
+    "whatsapp_message": "Hi, I'm interested in the property"
+  },
+  "map": {
+    "location": "Location",
+    "not_available": "Map view not available for",
+    "loading_map": "Loading map...",
+    "view_on_maps": "View on Google Maps"
+  }
+}

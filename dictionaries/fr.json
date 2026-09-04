@@ -1,0 +1,141 @@
+{
+  "navbar": {
+    "buy": "Acheter",
+    "rent": "Louer",
+    "sell": "Vendre",
+    "saved_homes": "Sauvegardés"
+  },
+  "hero": {
+    "title_start": "Trouvez votre",
+    "title_highlight": "sanctuaire",
+    "search_placeholder": "Recherche par ville, quartier ou adresse...",
+    "search_button": "Rechercher",
+    "categories": {
+      "All": "Tout",
+      "House": "Maison",
+      "Apartment": "Appartement",
+      "Villa": "Villa",
+      "Penthouse": "Attique"
+    },
+    "filters_button": "Filtres"
+  },
+  "filters": {
+    "title": "Filtres",
+    "location": "Emplacement",
+    "location_placeholder": "Ville, quartier ou adresse",
+    "price_range": "Fourchette de Prix",
+    "min_price": "Prix Min",
+    "max_price": "Prix Max",
+    "property_type": "Type de Propriété",
+    "property_types": {
+      "Any Type": "Tout Type",
+      "House": "Maison",
+      "Apartment": "Appartement",
+      "Condo": "Condominium",
+      "Townhouse": "Maison de Ville",
+      "Villa": "Villa",
+      "Penthouse": "Attique"
+    },
+    "bedrooms": "Chambres",
+    "bathrooms": "Salles de bain",
+    "any": "N'importe",
+    "amenities": "Commodités et Caractéristiques",
+    "amenity_list": {
+      "Swimming Pool": "Piscine",
+      "Gym": "Salle de sport",
+      "Parking": "Parking",
+      "Air Conditioning": "Climatisation",
+      "High-speed Wifi": "Wifi Haut Débit",
+      "Patio / Terrace": "Terrasse"
+    },
+    "clear_all": "Effacer tous les filtres",
+    "show_homes": "Afficher les Maisons"
+  },
+  "market": {
+    "title": "Nouveau sur le Marché",
+    "subtitle": "Nouvelles opportunités ajoutées cette semaine.",
+    "tabs": {
+      "All": "Tout",
+      "Buy": "Acheter",
+      "Rent": "Louer"
+    },
+    "no_properties": "Aucune propriété trouvée pour ce filtre.",
+    "pagination": {
+      "prev": "Préc",
+      "next": "Suiv"
+    }
+  },
+  "featured": {
+    "title": "Collections en Vedette",
+    "subtitle": "Propriétés sélectionnées pour les plus exigeants.",
+    "view_all": "Voir tout"
+  },
+  "property_card": {
+    "beds": "Lits",
+    "baths": "Sdb",
+    "for_sale": "À VENDRE",
+    "for_rent": "À LOUER",
+    "per_month": "/mois"
+  },
+  "property_details": {
+    "features_title": "Caractéristiques de la Propriété",
+    "square_area": "Superficie",
+    "bedrooms": "Chambres",
+    "bathrooms": "Salles de bain",
+    "garage": "Garage",
+    "about_title": "À propos de cette maison",
+    "amenities_title": "Commodités",
+    "view_all_photos": "Voir toutes les photos",
+    "badge_featured": "En Vedette",
+    "badge_new": "Nouveau",
+    "badge_exclusive": "Exclusif",
+    "badge_new_arrival": "Nouveauté",
+    "badge_hot_deal": "Bonne Affaire",
+    "badge_luxury": "Luxe",
+    "badge_for_sale": "À Vendre",
+    "badge_for_rent": "À Louer",
+    "default_description": "Découvrez le luxe moderne dans cette maison à l'architecture époustouflante située à {location}. Conçue avec un accent sur la vie intérieure-extérieure, la résidence dispose de murs vitrés du sol au plafond qui inondent les intérieurs de lumière naturelle.",
+    "footer_rights": "© 2023 LuxeEstate Inc. Tous droits réservés."
+  },
+  "detail_amenities": {
+    "Smart Home System": "Système Maison Intelligente",
+    "Swimming Pool": "Piscine",
+    "Central Heating & Cooling": "Chauffage et Climatisation Centraux",
+    "Electric Vehicle Charging": "Borne de Recharge Électrique",
+    "Private Gym": "Salle de Sport Privée",
+    "Wine Cellar": "Cave à Vin",
+    "Home Theater": "Cinéma Maison",
+    "Rooftop Terrace": "Terrasse sur le Toit",
+    "Garden": "Jardin",
+    "Security System": "Système de Sécurité",
+    "Spa": "Spa",
+    "Fireplace": "Cheminée"
+  },
+  "mortgage_calculator": {
+    "title": "Paiement Estimé",
+    "starting_from": "À partir de",
+    "with_down": "avec 20 % d'acompte",
+    "calculate": "Calculer l'Hypothèque"
+  },
+  "contact_form": {
+    "title": "Intéressé par cette propriété ?",
+    "contact_agent": "Contacter l'Agent",
+    "schedule_tour": "Planifier une Visite",
+    "your_name": "Votre Nom",
+    "email_address": "Adresse E-mail",
+    "phone_number": "Numéro de Téléphone",
+    "message": "Message",
+    "send_message": "Envoyer le Message",
+    "top_rated_agent": "Agent Très Bien Noté",
+    "chat": "Discuter",
+    "call": "Appeler",
+    "whatsapp_agent": "WhatsApp à l'Agent",
+    "whatsapp_message": "Bonjour, je suis intéressé par la propriété"
+  },
+  "map": {
+    "location": "Emplacement",
+    "not_available": "Vue de la carte non disponible pour",
+    "loading_map": "Chargement de la carte...",
+    "view_on_maps": "Voir sur Google Maps"
+  }
+}

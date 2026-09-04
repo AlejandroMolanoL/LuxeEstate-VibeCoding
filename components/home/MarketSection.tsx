@@ -9,6 +9,7 @@ interface MarketSectionProps {
   currentPage: number;
   totalPages: number;
   filter: FilterType;
+  dictionary?: any;
 }
 
 export default function MarketSection({
@@ -16,6 +17,7 @@ export default function MarketSection({
   currentPage,
   totalPages,
   filter,
+  dictionary,
 }: MarketSectionProps) {
   function filterHref(tab: FilterType) {
     const params = new URLSearchParams();
@@ -29,10 +31,10 @@ export default function MarketSection({
       <div className="flex items-end justify-between mb-8">
         <div>
           <h2 className="text-2xl font-light text-nordic-dark">
-            New in Market
+            {dictionary?.market?.title || "New in Market"}
           </h2>
           <p className="text-nordic-muted mt-1 text-sm">
-            Fresh opportunities added this week.
+            {dictionary?.market?.subtitle || "Fresh opportunities added this week."}
           </p>
         </div>
 
@@ -45,7 +47,7 @@ export default function MarketSection({
                 key={tab}
                 className="px-4 py-1.5 rounded-md text-sm font-medium bg-nordic-dark text-white shadow-sm"
               >
-                {tab}
+                {dictionary?.market?.tabs?.[tab] || tab}
               </span>
             ) : (
               <Link
@@ -53,7 +55,7 @@ export default function MarketSection({
                 href={filterHref(tab)}
                 className="px-4 py-1.5 rounded-md text-sm font-medium text-nordic-muted hover:text-nordic-dark transition-all"
               >
-                {tab}
+                {dictionary?.market?.tabs?.[tab] || tab}
               </Link>
             );
           })}
@@ -63,11 +65,11 @@ export default function MarketSection({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {properties.length > 0 ? (
           properties.map((property) => (
-            <PropertyCard key={property.id} property={property} />
+            <PropertyCard key={property.id} property={property} dictionary={dictionary} />
           ))
         ) : (
           <p className="col-span-full text-center text-nordic-muted py-16 text-sm">
-            No properties found for this filter.
+            {dictionary?.market?.no_properties || "No properties found for this filter."}
           </p>
         )}
       </div>
@@ -76,6 +78,7 @@ export default function MarketSection({
         currentPage={currentPage}
         totalPages={totalPages}
         filter={filter}
+        dictionary={dictionary}
       />
     </section>
   );

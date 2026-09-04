@@ -2,9 +2,10 @@
 
 interface MortgageCalculatorProps {
   price: number;
+  dictionary?: any;
 }
 
-export default function MortgageCalculator({ price }: MortgageCalculatorProps) {
+export default function MortgageCalculator({ price, dictionary }: MortgageCalculatorProps) {
   // Simple estimation: 20% down, 30 years, 5.5% interest rate
   const downPayment = price * 0.20;
   const principal = price - downPayment;
@@ -26,14 +27,14 @@ export default function MortgageCalculator({ price }: MortgageCalculatorProps) {
           <span className="material-icons">calculate</span>
         </div>
         <div>
-          <h3 className="font-semibold text-nordic">Estimated Payment</h3>
+          <h3 className="font-semibold text-nordic">{dictionary?.mortgage_calculator?.title || "Estimated Payment"}</h3>
           <p className="text-sm text-nordic/60">
-            Starting from <strong className="text-mosque">${totalEstimatedPayment.toLocaleString('en-US')}/mo</strong> with 20% down
+            {dictionary?.mortgage_calculator?.starting_from || "Starting from"} <strong className="text-mosque">${totalEstimatedPayment.toLocaleString('en-US')}/mo</strong> {dictionary?.mortgage_calculator?.with_down || "with 20% down"}
           </p>
         </div>
       </div>
       <button className="whitespace-nowrap px-4 py-2 bg-white border border-nordic/10 rounded-lg text-sm font-semibold hover:border-mosque transition-colors text-nordic">
-        Calculate Mortgage
+        {dictionary?.mortgage_calculator?.calculate || "Calculate Mortgage"}
       </button>
     </div>
   );
