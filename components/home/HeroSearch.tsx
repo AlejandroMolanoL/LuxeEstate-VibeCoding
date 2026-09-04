@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import FilterModal from './FilterModal';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface HeroSearchProps {
   onSearch?: (query: string) => void;
@@ -8,13 +10,31 @@ interface HeroSearchProps {
 }
 
 export default function HeroSearch({ onSearch, onSelectCategory }: HeroSearchProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
+  useEffect(() => {
+    setSearchQuery(searchParams.get('location') || '');
+    setSelectedCategory(searchParams.get('type') || 'All');
+  }, [searchParams]);
 
   const categories = ['All', 'House', 'Apartment', 'Villa', 'Penthouse'];
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const params = new URLSearchParams(searchParams.toString());
+    if (searchQuery) {
+      params.set('location', searchQuery);
+    } else {
+      params.delete('location');
+    }
+    params.set('page', '1');
+    router.push(`/?${params.toString()}`);
+
     if (onSearch) {
       onSearch(searchQuery);
     }
@@ -22,6 +42,15 @@ export default function HeroSearch({ onSearch, onSelectCategory }: HeroSearchPro
 
   const handleCategoryClick = (cat: string) => {
     setSelectedCategory(cat);
+    const params = new URLSearchParams(searchParams.toString());
+    if (cat === 'All') {
+      params.delete('type');
+    } else {
+      params.set('type', cat);
+    }
+    params.set('page', '1');
+    router.push(`/?${params.toString()}`);
+
     if (onSelectCategory) {
       onSelectCategory(cat);
     }
@@ -81,12 +110,15 @@ export default function HeroSearch({ onSearch, onSelectCategory }: HeroSearchPro
           <div className="w-px h-6 bg-nordic-dark/10 mx-2 hidden sm:block"></div>
           <button
             type="button"
+            onClick={() => setIsFiltersOpen(true)}
             className="whitespace-nowrap flex items-center gap-1 px-4 py-2 rounded-full text-nordic-dark font-medium text-sm hover:bg-black/5 transition-colors cursor-pointer"
           >
             <span className="material-icons text-base">tune</span> Filters
           </button>
         </div>
       </div>
+      
+      <FilterModal isOpen={isFiltersOpen} onClose={() => setIsFiltersOpen(false)} />
     </section>
   );
 }

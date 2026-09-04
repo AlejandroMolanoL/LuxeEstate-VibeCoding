@@ -33,7 +33,7 @@ export default function PropertyCard({ property, className = '' }: PropertyCardP
         <button
           onClick={toggleFavorite}
           aria-label="Add to saved homes"
-          className={`absolute top-3 right-3 p-2 rounded-full transition-colors cursor-pointer ${
+          className={`absolute top-3 right-3 w-10 h-10 flex items-center justify-center rounded-full transition-colors cursor-pointer ${
             isFavorite
               ? 'bg-mosque text-white'
               : 'bg-white/90 text-nordic-dark hover:bg-mosque hover:text-white'

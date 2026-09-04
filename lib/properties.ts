@@ -5,6 +5,17 @@ export const PAGE_SIZE = 8;
 
 export type FilterType = 'All' | 'Buy' | 'Rent';
 
+export interface AdvancedFilters {
+  filter: FilterType;
+  minPrice?: number;
+  maxPrice?: number;
+  beds?: number;
+  baths?: number;
+  amenities?: string[];
+  type?: string;
+  location?: string;
+}
+
 interface PropertiesResult {
   data: Property[];
   count: number;
@@ -40,7 +51,7 @@ function mapRow(row: Record<string, unknown>): Property {
 
 export async function getProperties(
   page: number = 1,
-  filter: FilterType = 'All',
+  filters: AdvancedFilters = { filter: 'All' },
   pageSize: number = PAGE_SIZE,
 ): Promise<PropertiesResult> {
   const from = (page - 1) * pageSize;
@@ -51,10 +62,22 @@ export async function getProperties(
     .select('*', { count: 'exact' })
     .order('created_at', { ascending: true });
 
-  if (filter === 'Buy') {
+  if (filters.filter === 'Buy') {
     query = query.eq('listing_type', 'FOR SALE');
-  } else if (filter === 'Rent') {
+  } else if (filters.filter === 'Rent') {
     query = query.eq('listing_type', 'FOR RENT');
+  }
+
+  if (filters.minPrice) query = query.gte('price', filters.minPrice);
+  if (filters.maxPrice) query = query.lte('price', filters.maxPrice);
+  if (filters.beds) query = query.gte('beds', filters.beds);
+  if (filters.baths) query = query.gte('baths', filters.baths);
+  if (filters.type && filters.type !== 'Any Type') query = query.eq('category', filters.type);
+  if (filters.amenities && filters.amenities.length > 0) {
+    query = query.contains('amenities', filters.amenities);
+  }
+  if (filters.location) {
+    query = query.ilike('location', `%${filters.location}%`);
   }
 
   const { data, error, count } = await query.range(from, to);
