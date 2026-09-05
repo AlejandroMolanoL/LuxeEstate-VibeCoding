@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { User } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 
 interface NavbarProps {
   activeTab?: string;
@@ -14,15 +16,38 @@ interface NavbarProps {
 export default function Navbar({ activeTab = 'Buy', onTabChange, dictionary, currentLocale = 'es' }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const [currentTab, setCurrentTab] = useState(activeTab);
   const router = useRouter();
   const langMenuRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
-  // Close language menu when clicking outside
+  // Subscribe to auth state changes and get initial session
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  // Close menus when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (langMenuRef.current && !langMenuRef.current.contains(event.target as Node)) {
         setIsLangMenuOpen(false);
+      }
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setIsUserMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -53,6 +78,21 @@ export default function Navbar({ activeTab = 'Buy', onTabChange, dictionary, cur
     document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000`;
     window.location.reload();
   };
+
+  const handleSignOut = async () => {
+    setIsUserMenuOpen(false);
+    await supabase.auth.signOut();
+    setUser(null);
+    router.refresh();
+  };
+
+  const userAvatar = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
+  const userName =
+    user?.user_metadata?.full_name ||
+    user?.user_metadata?.name ||
+    user?.email?.split('@')[0] ||
+    'User';
+  const userEmail = user?.email || '';
 
   const flags = {
     es: "https://flagcdn.com/w20/es.png",
@@ -148,15 +188,57 @@ export default function Navbar({ activeTab = 'Buy', onTabChange, dictionary, cur
               <span className="material-icons">notifications_none</span>
               <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-background-light"></span>
             </button>
-            <button className="flex items-center gap-2 pl-2 border-l border-nordic-dark/10 ml-2">
-              <div className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden ring-2 ring-transparent hover:ring-mosque transition-all">
-                <img
-                  alt="User Profile"
-                  className="w-full h-full object-cover"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAWhQZ663Bd08kmzjbOPmUk4UIxYooNONShMEFXLR-DtmVi6Oz-TiaY77SPwFk7g0OobkeZEOMvt6v29mSOD0Xm2g95WbBG3ZjWXmiABOUwGU0LOySRfVDo-JTXQ0-gtwjWxbmue0qDm91m-zEOEZwAW6iRFB1qC1bAU-wkjxm67Sbztq8w7srHkFT9bVEC86qG-FzhOBTomhAurNRmx9l8Yfqabk328NfdKuVLckgCdaPsNFE3yN65MeoRi05GA_gXIMwG4YDIeA"
-                />
+            {user ? (
+              <div className="relative" ref={userMenuRef}>
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center gap-2 pl-2 border-l border-nordic-dark/10 ml-2 focus:outline-none cursor-pointer"
+                  aria-label="User Profile"
+                >
+                  <div className="w-9 h-9 rounded-full bg-gray-100 overflow-hidden ring-2 ring-transparent hover:ring-mosque transition-all flex items-center justify-center border border-gray-200">
+                    {userAvatar ? (
+                      <img
+                        alt={userName}
+                        className="w-full h-full object-cover"
+                        src={userAvatar}
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <span className="text-sm font-semibold text-mosque uppercase">
+                        {userName.charAt(0)}
+                      </span>
+                    )}
+                  </div>
+                </button>
+
+                {/* User Dropdown Menu */}
+                {isUserMenuOpen && (
+                  <div className="absolute top-full mt-2 right-0 bg-white border border-mosque/10 shadow-lg rounded-xl overflow-hidden z-50 w-56 py-2">
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="text-sm font-semibold text-nordic truncate">{userName}</p>
+                      <p className="text-xs text-nordic/60 truncate">{userEmail}</p>
+                    </div>
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors cursor-pointer"
+                    >
+                      <span className="material-icons text-base">logout</span>
+                      <span>{dictionary?.logout || 'Sign Out'}</span>
+                    </button>
+                  </div>
+                )}
               </div>
-            </button>
+            ) : (
+              <div className="pl-2 border-l border-nordic-dark/10 ml-2">
+                <Link
+                  href="/login"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-mosque text-white text-sm font-medium hover:bg-primary-dark transition-all shadow-sm hover:shadow-soft-hover"
+                >
+                  <span className="material-icons text-base">login</span>
+                  <span>{dictionary?.login || 'Sign In'}</span>
+                </Link>
+              </div>
+            )}
 
             {/* Mobile menu button */}
             <button
@@ -192,6 +274,52 @@ export default function Navbar({ activeTab = 'Buy', onTabChange, dictionary, cur
               </button>
             );
           })}
+
+          <div className="pt-3 border-t border-nordic-dark/10 mt-2">
+            {user ? (
+              <div className="space-y-2">
+                <div className="flex items-center gap-3 px-3 py-2">
+                  <div className="w-8 h-8 rounded-full bg-gray-100 overflow-hidden flex items-center justify-center border border-gray-200">
+                    {userAvatar ? (
+                      <img
+                        alt={userName}
+                        className="w-full h-full object-cover"
+                        src={userAvatar}
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <span className="text-xs font-semibold text-mosque uppercase">
+                        {userName.charAt(0)}
+                      </span>
+                    )}
+                  </div>
+                  <div className="truncate">
+                    <p className="text-sm font-medium text-nordic truncate">{userName}</p>
+                    <p className="text-xs text-nordic/60 truncate">{userEmail}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    handleSignOut();
+                  }}
+                  className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md flex items-center gap-2 font-medium cursor-pointer"
+                >
+                  <span className="material-icons text-base">logout</span>
+                  <span>{dictionary?.logout || 'Sign Out'}</span>
+                </button>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg bg-mosque text-white text-sm font-medium hover:bg-primary-dark transition-colors"
+              >
+                <span className="material-icons text-base">login</span>
+                <span>{dictionary?.login || 'Sign In'}</span>
+              </Link>
+            )}
+          </div>
         </div>
       )}
     </nav>
