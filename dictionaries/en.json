@@ -5,7 +5,12 @@
     "sell": "Sell",
     "saved_homes": "Saved Homes",
     "login": "Sign In",
-    "logout": "Sign Out"
+    "logout": "Sign Out",
+    "admin_badge": "Admin",
+    "admin_section": "Administration",
+    "admin_dashboard": "General Dashboard",
+    "admin_properties": "Manage Properties",
+    "admin_users": "Manage Users"
   },
   "hero": {
     "title_start": "Find your",

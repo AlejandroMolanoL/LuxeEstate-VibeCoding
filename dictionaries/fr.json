@@ -5,7 +5,12 @@
     "sell": "Vendre",
     "saved_homes": "Sauvegardés",
     "login": "Connexion",
-    "logout": "Déconnexion"
+    "logout": "Déconnexion",
+    "admin_badge": "Admin",
+    "admin_section": "Administration",
+    "admin_dashboard": "Tableau de bord",
+    "admin_properties": "Gestion des Propriétés",
+    "admin_users": "Gestion des Utilisateurs"
   },
   "hero": {
     "title_start": "Trouvez votre",

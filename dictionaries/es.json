@@ -5,7 +5,12 @@
     "sell": "Vender",
     "saved_homes": "Guardados",
     "login": "Iniciar sesión",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "admin_badge": "Admin",
+    "admin_section": "Administración",
+    "admin_dashboard": "Panel General",
+    "admin_properties": "Gestión de Propiedades",
+    "admin_users": "Gestión de Usuarios"
   },
   "hero": {
     "title_start": "Encuentra tu",

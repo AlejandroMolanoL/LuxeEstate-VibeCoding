@@ -18,6 +18,7 @@ export default function Navbar({ activeTab = 'Buy', onTabChange, dictionary, cur
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [currentTab, setCurrentTab] = useState(activeTab);
   const router = useRouter();
   const langMenuRef = useRef<HTMLDivElement>(null);
@@ -25,14 +26,47 @@ export default function Navbar({ activeTab = 'Buy', onTabChange, dictionary, cur
 
   // Subscribe to auth state changes and get initial session
   useEffect(() => {
+    const checkAdminStatus = async (currentUser: User | null) => {
+      if (!currentUser) {
+        setIsAdmin(false);
+        return;
+      }
+      try {
+        const { data, error } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', currentUser.id)
+          .single();
+
+        if (!error && data?.role === 'admin') {
+          setIsAdmin(true);
+        } else if (currentUser.email === 'molanolozanoalejandro@gmail.com') {
+          setIsAdmin(true);
+        } else {
+          setIsAdmin(false);
+        }
+      } catch (err) {
+        console.error('Error checking admin status:', err);
+        if (currentUser.email === 'molanolozanoalejandro@gmail.com') {
+          setIsAdmin(true);
+        } else {
+          setIsAdmin(false);
+        }
+      }
+    };
+
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+      checkAdminStatus(currentUser);
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+      checkAdminStatus(currentUser);
     });
 
     return () => {
@@ -138,34 +172,34 @@ export default function Navbar({ activeTab = 'Buy', onTabChange, dictionary, cur
           <div className="flex items-center space-x-4 md:space-x-6">
             {/* Custom Language Selector */}
             <div className="relative" ref={langMenuRef}>
-              <button 
+              <button
                 onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
                 className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
                 aria-label="Select language"
               >
-                <img 
-                  src={flags[currentLocale as keyof typeof flags] || flags.es} 
-                  alt={currentLocale} 
+                <img
+                  src={flags[currentLocale as keyof typeof flags] || flags.es}
+                  alt={currentLocale}
                   className="w-5 h-auto rounded-[2px] shadow-sm"
                 />
                 <span className="text-sm font-medium text-nordic-dark uppercase">{currentLocale}</span>
                 <span className="material-icons text-nordic-dark/70 text-[16px]">expand_more</span>
               </button>
-              
+
               {isLangMenuOpen && (
                 <div className="absolute top-full mt-2 right-0 bg-white border border-mosque/10 shadow-lg rounded-xl overflow-hidden z-50 w-24 py-1">
                   {(['es', 'en', 'fr'] as const).map(lang => (
-                    <button 
-                      key={lang} 
-                      onClick={() => { 
-                        handleLanguageChange(lang); 
-                        setIsLangMenuOpen(false); 
-                      }} 
+                    <button
+                      key={lang}
+                      onClick={() => {
+                        handleLanguageChange(lang);
+                        setIsLangMenuOpen(false);
+                      }}
                       className={`flex items-center gap-2 px-4 py-2 hover:bg-mosque/5 w-full text-left transition-colors ${currentLocale === lang ? 'bg-mosque/5 text-mosque' : 'text-nordic-dark'}`}
                     >
-                      <img 
-                        src={flags[lang]} 
-                        alt={lang} 
+                      <img
+                        src={flags[lang]}
+                        alt={lang}
                         className="w-5 h-auto rounded-[2px] shadow-sm"
                       />
                       <span className="text-sm font-medium uppercase">{lang}</span>
@@ -213,18 +247,61 @@ export default function Navbar({ activeTab = 'Buy', onTabChange, dictionary, cur
 
                 {/* User Dropdown Menu */}
                 {isUserMenuOpen && (
-                  <div className="absolute top-full mt-2 right-0 bg-white border border-mosque/10 shadow-lg rounded-xl overflow-hidden z-50 w-56 py-2">
-                    <div className="px-4 py-2 border-b border-gray-100">
-                      <p className="text-sm font-semibold text-nordic truncate">{userName}</p>
-                      <p className="text-xs text-nordic/60 truncate">{userEmail}</p>
+                  <div className="absolute top-full mt-2 right-0 bg-white border border-mosque/10 shadow-lg rounded-xl overflow-hidden z-50 w-60 py-2">
+                    <div className="px-4 py-2.5 border-b border-gray-100">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-sm font-semibold text-nordic truncate">{userName}</p>
+                        {isAdmin && (
+                          <span className="px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-mosque/10 text-mosque border border-mosque/20 rounded">
+                            {dictionary?.admin_badge || 'Admin'}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-nordic/60 truncate mt-0.5">{userEmail}</p>
                     </div>
-                    <button
-                      onClick={handleSignOut}
-                      className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors cursor-pointer"
-                    >
-                      <span className="material-icons text-base">logout</span>
-                      <span>{dictionary?.logout || 'Sign Out'}</span>
-                    </button>
+
+                    {/* Admin Access Section */}
+                    {isAdmin && (
+                      <div className="py-1.5 border-b border-gray-100 bg-gray-50/40">
+                        <p className="px-4 py-1 text-[10px] font-bold text-nordic/40 uppercase tracking-wider">
+                          {dictionary?.admin_section || 'Administración'}
+                        </p>
+                        <Link
+                          href="/admin"
+                          onClick={() => setIsUserMenuOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-nordic hover:text-mosque hover:bg-mosque/5 transition-colors font-medium"
+                        >
+                          <span className="material-icons text-base text-mosque">dashboard</span>
+                          <span>{dictionary?.admin_dashboard || 'Panel General'}</span>
+                        </Link>
+                        <Link
+                          href="/admin/propiedades"
+                          onClick={() => setIsUserMenuOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-nordic hover:text-mosque hover:bg-mosque/5 transition-colors font-medium"
+                        >
+                          <span className="material-icons text-base text-mosque">apartment</span>
+                          <span>{dictionary?.admin_properties || 'Gestión de Propiedades'}</span>
+                        </Link>
+                        <Link
+                          href="/admin/usuarios"
+                          onClick={() => setIsUserMenuOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-nordic hover:text-mosque hover:bg-mosque/5 transition-colors font-medium"
+                        >
+                          <span className="material-icons text-base text-mosque">manage_accounts</span>
+                          <span>{dictionary?.admin_users || 'Gestión de Usuarios'}</span>
+                        </Link>
+                      </div>
+                    )}
+
+                    <div className="pt-1">
+                      <button
+                        onClick={handleSignOut}
+                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2.5 transition-colors cursor-pointer"
+                      >
+                        <span className="material-icons text-base">logout</span>
+                        <span>{dictionary?.logout || 'Sign Out'}</span>
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -264,11 +341,10 @@ export default function Navbar({ activeTab = 'Buy', onTabChange, dictionary, cur
                   handleTabClick(item);
                   setIsMobileMenuOpen(false);
                 }}
-                className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                  isActive
+                className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-colors ${isActive
                     ? 'text-mosque bg-mosque/10'
                     : 'text-nordic-dark hover:bg-black/5'
-                }`}
+                  }`}
               >
                 {getTranslatedItem(item)}
               </button>
@@ -298,6 +374,39 @@ export default function Navbar({ activeTab = 'Buy', onTabChange, dictionary, cur
                     <p className="text-xs text-nordic/60 truncate">{userEmail}</p>
                   </div>
                 </div>
+
+                {isAdmin && (
+                  <div className="pt-2 pb-1 border-t border-nordic-dark/10 space-y-1">
+                    <p className="px-3 text-[10px] font-bold text-nordic-dark/40 uppercase tracking-wider">
+                      {dictionary?.admin_section || 'Administración'}
+                    </p>
+                    <Link
+                      href="/admin"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2 text-sm text-nordic-dark hover:text-mosque hover:bg-mosque/5 rounded-md font-medium"
+                    >
+                      <span className="material-icons text-base text-mosque">dashboard</span>
+                      <span>{dictionary?.admin_dashboard || 'Panel General'}</span>
+                    </Link>
+                    <Link
+                      href="/admin/propiedades"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2 text-sm text-nordic-dark hover:text-mosque hover:bg-mosque/5 rounded-md font-medium"
+                    >
+                      <span className="material-icons text-base text-mosque">apartment</span>
+                      <span>{dictionary?.admin_properties || 'Gestión de Propiedades'}</span>
+                    </Link>
+                    <Link
+                      href="/admin/usuarios"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2 text-sm text-nordic-dark hover:text-mosque hover:bg-mosque/5 rounded-md font-medium"
+                    >
+                      <span className="material-icons text-base text-mosque">manage_accounts</span>
+                      <span>{dictionary?.admin_users || 'Gestión de Usuarios'}</span>
+                    </Link>
+                  </div>
+                )}
+
                 <button
                   onClick={() => {
                     setIsMobileMenuOpen(false);
