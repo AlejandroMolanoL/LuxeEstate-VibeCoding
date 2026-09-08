@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import AdminUserNav from '@/components/admin/AdminUserNav';
 
 export default function AdminLayout({
   children,
@@ -45,16 +46,8 @@ export default function AdminLayout({
               </nav>
             </div>
 
-            {/* Back to main site */}
-            <div className="flex items-center gap-4">
-              <Link
-                href="/"
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-nordic/15 text-nordic text-xs font-semibold hover:border-mosque hover:text-mosque transition-colors"
-              >
-                <span className="material-icons text-sm">open_in_new</span>
-                <span>Ver Sitio Web</span>
-              </Link>
-            </div>
+            {/* Right side: User profile, notifications, web link and sign out */}
+            <AdminUserNav />
           </div>
         </div>
       </header>
