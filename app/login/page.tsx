@@ -13,7 +13,9 @@ export default function LoginPage() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        router.replace('/');
+        const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+        const redirect = params?.get('redirect') || '/';
+        router.replace(redirect);
       }
     });
   }, [router]);
@@ -23,7 +25,9 @@ export default function LoginPage() {
       setLoadingProvider(provider);
       setErrorMessage(null);
 
-      const redirectTo = `${window.location.origin}/auth/callback`;
+      const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+      const redirect = params?.get('redirect') || '/';
+      const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirect)}`;
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
