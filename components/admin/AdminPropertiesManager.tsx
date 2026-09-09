@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
+import { deletePropertyAction } from '@/app/admin/propiedades/actions';
 
 export interface PropertyItem {
   id: string;
@@ -16,7 +17,7 @@ export interface PropertyItem {
   baths?: number;
   area?: string;
   images?: string[];
-  listing_type: 'FOR SALE' | 'FOR RENT';
+  listing_type: 'FOR SALE' | 'FOR RENT' | 'SOLD';
   category?: string;
   created_at?: string;
   [key: string]: unknown;
@@ -24,30 +25,60 @@ export interface PropertyItem {
 
 interface AdminPropertiesManagerProps {
   initialProperties: PropertyItem[];
+  dictionary?: any;
+  currentLocale?: string;
 }
 
 export default function AdminPropertiesManager({
   initialProperties,
+  dictionary,
+  currentLocale = 'es',
 }: AdminPropertiesManagerProps) {
+  const t = dictionary?.admin_properties;
+  const [propertiesList, setPropertiesList] = useState<PropertyItem[]>(initialProperties);
   const [filterType, setFilterType] = useState<'ALL' | 'FOR SALE' | 'FOR RENT'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
   const pageSize = 6;
 
+  useEffect(() => {
+    setPropertiesList(initialProperties);
+  }, [initialProperties]);
+
+  const handleDelete = async (id: string, title: string) => {
+    const confirmText = (t?.delete_confirm || '¿Estás seguro de eliminar la propiedad "{title}"?').replace(
+      '{title}',
+      title
+    );
+    if (!window.confirm(confirmText)) {
+      return;
+    }
+
+    setIsDeletingId(id);
+    const res = await deletePropertyAction(id);
+    if (res.success) {
+      setPropertiesList((prev) => prev.filter((p) => p.id !== id));
+    } else {
+      alert(res.error || 'No se pudo eliminar la propiedad');
+    }
+    setIsDeletingId(null);
+  };
+
   // Compute stat totals
-  const totalCount = initialProperties.length;
+  const totalCount = propertiesList.length;
   const forSaleCount = useMemo(
-    () => initialProperties.filter((p) => p.listing_type === 'FOR SALE').length,
-    [initialProperties]
+    () => propertiesList.filter((p) => p.listing_type === 'FOR SALE').length,
+    [propertiesList]
   );
   const forRentCount = useMemo(
-    () => initialProperties.filter((p) => p.listing_type === 'FOR RENT').length,
-    [initialProperties]
+    () => propertiesList.filter((p) => p.listing_type === 'FOR RENT').length,
+    [propertiesList]
   );
 
   // Filter properties by tab and search query
   const filteredProperties = useMemo(() => {
-    return initialProperties.filter((property) => {
+    return propertiesList.filter((property) => {
       // Filter by quick tab
       if (filterType !== 'ALL' && property.listing_type !== filterType) {
         return false;
@@ -64,7 +95,7 @@ export default function AdminPropertiesManager({
 
       return true;
     });
-  }, [initialProperties, filterType, searchQuery]);
+  }, [propertiesList, filterType, searchQuery]);
 
   // Pagination calculations
   const totalResults = filteredProperties.length;
@@ -101,10 +132,11 @@ export default function AdminPropertiesManager({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-nordic tracking-tight">
-            Gestión de Propiedades
+            {t?.title || 'Gestión de Propiedades'}
           </h1>
           <p className="text-nordic/60 text-sm mt-1">
-            Administra el portafolio de inmuebles, filtra por disponibilidad y gestiona sus datos.
+            {t?.subtitle ||
+              'Administra el portafolio de inmuebles, filtra por disponibilidad y gestiona sus datos.'}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -113,15 +145,15 @@ export default function AdminPropertiesManager({
             className="bg-white border border-nordic/15 text-nordic hover:bg-black/5 px-4 py-2 rounded-lg text-sm font-medium transition-colors inline-flex items-center gap-2 shadow-sm"
           >
             <span className="material-icons text-base text-mosque">group</span>
-            <span>Ver Usuarios</span>
+            <span>{t?.view_users || 'Ver Usuarios'}</span>
           </Link>
-          <button
-            type="button"
+          <Link
+            href="/admin/propiedades/nueva"
             className="bg-mosque hover:bg-primary-dark text-white px-4 py-2.5 rounded-lg text-sm font-medium shadow-sm transition-all transform hover:-translate-y-0.5 inline-flex items-center gap-2 cursor-pointer"
           >
             <span className="material-icons text-base">add</span>
-            <span>Nueva Propiedad</span>
-          </button>
+            <span>{t?.new_property || 'Nueva Propiedad'}</span>
+          </Link>
         </div>
       </div>
 
@@ -140,11 +172,11 @@ export default function AdminPropertiesManager({
           <div>
             <div className="flex items-center gap-2">
               <p className="text-[11px] font-bold text-nordic/60 uppercase tracking-wider">
-                Total Propiedades
+                {t?.total_properties || 'Total Propiedades'}
               </p>
               {filterType === 'ALL' && (
                 <span className="bg-mosque text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase">
-                  Activo
+                  {t?.active || 'Activo'}
                 </span>
               )}
             </div>
@@ -174,11 +206,11 @@ export default function AdminPropertiesManager({
           <div>
             <div className="flex items-center gap-2">
               <p className="text-[11px] font-bold text-nordic/60 uppercase tracking-wider">
-                En Venta
+                {t?.for_sale || 'En Venta'}
               </p>
               {filterType === 'FOR SALE' && (
                 <span className="bg-mosque text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase">
-                  Activo
+                  {t?.active || 'Activo'}
                 </span>
               )}
             </div>
@@ -208,11 +240,11 @@ export default function AdminPropertiesManager({
           <div>
             <div className="flex items-center gap-2">
               <p className="text-[11px] font-bold text-nordic/60 uppercase tracking-wider">
-                En Alquiler
+                {t?.for_rent || 'En Alquiler'}
               </p>
               {filterType === 'FOR RENT' && (
                 <span className="bg-amber-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase">
-                  Activo
+                  {t?.active || 'Activo'}
                 </span>
               )}
             </div>
@@ -240,7 +272,7 @@ export default function AdminPropertiesManager({
             type="text"
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
-            placeholder="Filtrar por título, ubicación o categoría..."
+            placeholder={t?.search_placeholder || 'Filtrar por título, ubicación o categoría...'}
             className="w-full pl-10 pr-10 py-2 rounded-lg border border-nordic/15 text-nordic placeholder-nordic/40 text-sm focus:outline-none focus:ring-2 focus:ring-mosque focus:border-mosque transition-all"
           />
           {searchQuery && (
@@ -248,7 +280,7 @@ export default function AdminPropertiesManager({
               type="button"
               onClick={() => handleSearchChange('')}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-nordic/40 hover:text-nordic transition-colors p-0.5"
-              title="Limpiar búsqueda"
+              title={t?.reset || 'Limpiar búsqueda'}
             >
               <span className="material-icons text-base">close</span>
             </button>
@@ -258,7 +290,7 @@ export default function AdminPropertiesManager({
         {/* Filter State Indicators */}
         <div className="flex items-center gap-2 text-xs text-nordic/60 w-full sm:w-auto justify-between sm:justify-end">
           <span>
-            {totalResults} {totalResults === 1 ? 'propiedad encontrada' : 'propiedades encontradas'}
+            {totalResults} {totalResults === 1 ? (t?.found_singular || 'propiedad encontrada') : (t?.found_plural || 'propiedades encontradas')}
           </span>
           {(filterType !== 'ALL' || searchQuery) && (
             <button
@@ -271,7 +303,7 @@ export default function AdminPropertiesManager({
               className="text-mosque hover:underline font-semibold ml-2 inline-flex items-center gap-1 cursor-pointer"
             >
               <span className="material-icons text-xs">restart_alt</span>
-              <span>Restablecer</span>
+              <span>{t?.reset || 'Restablecer'}</span>
             </button>
           )}
         </div>
@@ -281,10 +313,10 @@ export default function AdminPropertiesManager({
       <div className="bg-white rounded-xl shadow-sm border border-nordic/10 overflow-hidden">
         {/* Table Header */}
         <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50/70 border-b border-gray-100 text-xs font-semibold text-nordic/60 uppercase tracking-wider">
-          <div className="col-span-6">Detalles de la Propiedad</div>
-          <div className="col-span-2">Precio</div>
-          <div className="col-span-2">Tipo / Estado</div>
-          <div className="col-span-2 text-right">Acciones</div>
+          <div className="col-span-6">{t?.table_property_details || 'Detalles de la Propiedad'}</div>
+          <div className="col-span-2">{t?.table_price || 'Precio'}</div>
+          <div className="col-span-2">{t?.table_status || 'Tipo / Estado'}</div>
+          <div className="col-span-2 text-right">{t?.table_actions || 'Acciones'}</div>
         </div>
 
         {/* Property Rows */}
@@ -295,6 +327,13 @@ export default function AdminPropertiesManager({
                 Array.isArray(item.images) && item.images.length > 0
                   ? item.images[0]
                   : 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80';
+
+              const statusLabel =
+                item.listing_type === 'FOR SALE'
+                  ? (t?.for_sale || 'En Venta')
+                  : item.listing_type === 'SOLD'
+                  ? (t?.sold || 'Vendida')
+                  : (t?.for_rent || 'En Alquiler');
 
               return (
                 <div
@@ -323,14 +362,14 @@ export default function AdminPropertiesManager({
                         {item.beds && (
                           <span className="flex items-center gap-1">
                             <span className="material-icons text-[14px]">bed</span>
-                            <span>{item.beds} Habs</span>
+                            <span>{item.beds} {t?.beds_short || 'Habs'}</span>
                           </span>
                         )}
                         {item.beds && item.baths && <span>•</span>}
                         {item.baths && (
                           <span className="flex items-center gap-1">
                             <span className="material-icons text-[14px]">bathtub</span>
-                            <span>{item.baths} Baños</span>
+                            <span>{item.baths} {t?.baths_short || 'Baños'}</span>
                           </span>
                         )}
                         {item.area && (
@@ -362,15 +401,17 @@ export default function AdminPropertiesManager({
                       className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
                         item.listing_type === 'FOR SALE'
                           ? 'bg-hint-green/60 text-mosque border border-mosque/15'
+                          : item.listing_type === 'SOLD'
+                          ? 'bg-gray-100 text-gray-700 border border-gray-200'
                           : 'bg-amber-50 text-amber-800 border border-amber-200'
                       }`}
                     >
                       <span
                         className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
-                          item.listing_type === 'FOR SALE' ? 'bg-mosque' : 'bg-amber-600'
+                          item.listing_type === 'FOR SALE' ? 'bg-mosque' : item.listing_type === 'SOLD' ? 'bg-gray-500' : 'bg-amber-600'
                         }`}
                       />
-                      {item.listing_type === 'FOR SALE' ? 'En Venta' : 'En Alquiler'}
+                      {statusLabel}
                     </span>
                   </div>
 
@@ -380,23 +421,29 @@ export default function AdminPropertiesManager({
                       href={`/propiedades/${item.id}`}
                       target="_blank"
                       className="p-2 rounded-lg text-nordic/50 hover:text-mosque hover:bg-mosque/10 transition-all cursor-pointer"
-                      title="Ver Propiedad en Vivo"
+                      title={t?.view_live || 'Ver Propiedad en Vivo'}
                     >
                       <span className="material-icons text-lg">visibility</span>
                     </Link>
-                    <button
-                      type="button"
-                      className="p-2 rounded-lg text-nordic/50 hover:text-mosque hover:bg-hint-green/40 transition-all cursor-pointer"
-                      title="Editar Propiedad"
+                    <Link
+                      href={`/admin/propiedades/${item.id}/editar`}
+                      className="p-2 rounded-lg text-nordic/50 hover:text-mosque hover:bg-hint-green/40 transition-all cursor-pointer inline-flex items-center justify-center"
+                      title={t?.edit_property || 'Editar Propiedad'}
                     >
                       <span className="material-icons text-lg">edit</span>
-                    </button>
+                    </Link>
                     <button
                       type="button"
-                      className="p-2 rounded-lg text-nordic/50 hover:text-red-600 hover:bg-red-50 transition-all cursor-pointer"
-                      title="Eliminar Propiedad"
+                      onClick={() => handleDelete(item.id, item.title)}
+                      disabled={isDeletingId === item.id}
+                      className="p-2 rounded-lg text-nordic/50 hover:text-red-600 hover:bg-red-50 transition-all cursor-pointer disabled:opacity-40"
+                      title={t?.delete_property || 'Eliminar Propiedad'}
                     >
-                      <span className="material-icons text-lg">delete_outline</span>
+                      {isDeletingId === item.id ? (
+                        <span className="material-icons text-lg animate-spin">refresh</span>
+                      ) : (
+                        <span className="material-icons text-lg">delete_outline</span>
+                      )}
                     </button>
                   </div>
                 </div>
@@ -408,9 +455,12 @@ export default function AdminPropertiesManager({
             <div className="w-12 h-12 rounded-full bg-nordic/5 text-nordic/40 mx-auto flex items-center justify-center mb-3">
               <span className="material-icons text-2xl">search_off</span>
             </div>
-            <h3 className="text-base font-semibold text-nordic">No se encontraron propiedades</h3>
+            <h3 className="text-base font-semibold text-nordic">
+              {t?.no_properties_title || 'No se encontraron propiedades'}
+            </h3>
             <p className="text-xs text-nordic/60 mt-1 max-w-sm mx-auto">
-              Prueba cambiando el término de búsqueda o seleccionando otra categoría de filtro.
+              {t?.no_properties_desc ||
+                'Prueba cambiando el término de búsqueda o seleccionando otra categoría de filtro.'}
             </p>
             <button
               type="button"
@@ -421,7 +471,7 @@ export default function AdminPropertiesManager({
               }}
               className="mt-4 px-4 py-1.5 bg-mosque/10 text-mosque rounded-lg text-xs font-semibold hover:bg-mosque hover:text-white transition-colors"
             >
-              Ver todas las propiedades
+              {t?.view_all || 'Ver todas las propiedades'}
             </button>
           </div>
         )}
@@ -430,9 +480,9 @@ export default function AdminPropertiesManager({
         {totalResults > 0 && (
           <div className="px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 bg-gray-50/50">
             <div className="text-sm text-nordic/70">
-              Mostrando <span className="font-semibold text-nordic">{startRecord}</span> a{' '}
-              <span className="font-semibold text-nordic">{endRecord}</span> de{' '}
-              <span className="font-semibold text-nordic">{totalResults}</span> resultados
+              {t?.showing || 'Mostrando'} <span className="font-semibold text-nordic">{startRecord}</span> {t?.to || 'a'}{' '}
+              <span className="font-semibold text-nordic">{endRecord}</span> {t?.of || 'de'}{' '}
+              <span className="font-semibold text-nordic">{totalResults}</span> {t?.results || 'resultados'}
             </div>
 
             <div className="flex items-center gap-1.5">
@@ -443,7 +493,7 @@ export default function AdminPropertiesManager({
                 className="px-3 py-1.5 text-xs font-medium border border-nordic/15 rounded-lg text-nordic/80 hover:bg-white hover:border-mosque disabled:opacity-40 disabled:cursor-not-allowed transition-colors inline-flex items-center gap-1"
               >
                 <span className="material-icons text-sm">chevron_left</span>
-                <span>Anterior</span>
+                <span>{t?.previous || 'Anterior'}</span>
               </button>
 
               {/* Page Number Buttons */}
@@ -473,7 +523,7 @@ export default function AdminPropertiesManager({
                 disabled={safeCurrentPage >= totalPages}
                 className="px-3 py-1.5 text-xs font-medium border border-nordic/15 rounded-lg text-nordic/80 hover:bg-white hover:border-mosque disabled:opacity-40 disabled:cursor-not-allowed transition-colors inline-flex items-center gap-1"
               >
-                <span>Siguiente</span>
+                <span>{t?.next || 'Siguiente'}</span>
                 <span className="material-icons text-sm">chevron_right</span>
               </button>
             </div>

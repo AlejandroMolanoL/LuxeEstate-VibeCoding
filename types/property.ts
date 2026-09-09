@@ -1,5 +1,5 @@
-export type PropertyListingType = 'FOR SALE' | 'FOR RENT';
-export type PropertyCategory = 'House' | 'Apartment' | 'Villa' | 'Penthouse';
+export type PropertyListingType = 'FOR SALE' | 'FOR RENT' | 'SOLD';
+export type PropertyCategory = 'House' | 'Apartment' | 'Villa' | 'Penthouse' | 'Commercial';
 
 export interface Property {
   id: string;
@@ -12,7 +12,9 @@ export interface Property {
   pricePeriod?: string; // e.g. "/mo"
   beds: number;
   baths: number;
+  parking?: number;
   area: string; // e.g. "4,200 m²" or "120m²"
+  yearBuilt?: number;
   images: string[];
   imageAlt?: string;
   badge?: string; // e.g. "Exclusive", "New Arrival"

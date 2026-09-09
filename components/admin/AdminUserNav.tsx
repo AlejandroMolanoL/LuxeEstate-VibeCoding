@@ -6,11 +6,18 @@ import { useRouter } from 'next/navigation';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 
-export default function AdminUserNav() {
+interface AdminUserNavProps {
+  currentLocale?: string;
+  dictionary?: any;
+}
+
+export default function AdminUserNav({ currentLocale = 'es', dictionary }: AdminUserNavProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [isLangOpen, setIsLangOpen] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const langRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -37,10 +44,18 @@ export default function AdminUserNav() {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
+      if (langRef.current && !langRef.current.contains(event.target as Node)) {
+        setIsLangOpen(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const handleLanguageChange = (newLocale: string) => {
+    document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000`;
+    window.location.reload();
+  };
 
   const handleSignOut = async () => {
     try {
@@ -69,18 +84,67 @@ export default function AdminUserNav() {
     user?.user_metadata?.picture ||
     'https://avatars.githubusercontent.com/u/69174170?v=4';
 
+  const flags: Record<string, { flag: string; label: string }> = {
+    es: { flag: 'https://flagcdn.com/w20/es.png', label: 'Español' },
+    en: { flag: 'https://flagcdn.com/w20/us.png', label: 'English' },
+    fr: { flag: 'https://flagcdn.com/w20/fr.png', label: 'Français' },
+  };
+
+  const activeLocale = flags[currentLocale] ? currentLocale : 'es';
+
   return (
     <div className="flex items-center gap-3 sm:gap-4">
+      {/* Language Switcher Dropdown */}
+      <div className="relative" ref={langRef}>
+        <button
+          type="button"
+          onClick={() => setIsLangOpen(!isLangOpen)}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-nordic/15 text-nordic hover:border-mosque hover:bg-mosque/5 transition-all text-xs font-semibold cursor-pointer shadow-xs"
+          title="Cambiar Idioma / Change Language"
+        >
+          <img
+            src={flags[activeLocale].flag}
+            alt={flags[activeLocale].label}
+            className="w-4 h-3 object-cover rounded-xs"
+          />
+          <span className="uppercase text-[11px] font-bold">{activeLocale}</span>
+          <span className="material-icons text-xs text-nordic/50">arrow_drop_down</span>
+        </button>
+
+        {isLangOpen && (
+          <div className="absolute top-full mt-2 right-0 bg-white border border-nordic/10 shadow-lg rounded-xl overflow-hidden z-50 w-36 py-1 animate-in fade-in zoom-in-95 duration-100">
+            {Object.entries(flags).map(([key, item]) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => {
+                  setIsLangOpen(false);
+                  handleLanguageChange(key);
+                }}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition-colors cursor-pointer text-left ${
+                  activeLocale === key
+                    ? 'bg-mosque/10 text-mosque font-bold'
+                    : 'text-nordic hover:bg-gray-50'
+                }`}
+              >
+                <img src={item.flag} alt={item.label} className="w-4 h-3 object-cover rounded-xs" />
+                <span>{item.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Back to main site link */}
       <Link
         href="/"
         className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-nordic/15 text-nordic text-xs font-semibold hover:border-mosque hover:text-mosque transition-colors"
       >
         <span className="material-icons text-sm">open_in_new</span>
-        <span>Ver Sitio Web</span>
+        <span>{activeLocale === 'es' ? 'Ver Sitio Web' : activeLocale === 'fr' ? 'Voir le Site' : 'View Website'}</span>
       </Link>
 
-      {/* Notifications icon matching code.html */}
+      {/* Notifications icon */}
       <button
         type="button"
         aria-label="Notificaciones"
@@ -109,7 +173,7 @@ export default function AdminUserNav() {
               {userName}
             </span>
             <span className="text-[11px] font-medium text-mosque">
-              Administrador
+              {activeLocale === 'es' ? 'Administrador' : activeLocale === 'fr' ? 'Administrateur' : 'Administrator'}
             </span>
           </div>
 
@@ -162,7 +226,7 @@ export default function AdminUserNav() {
                 className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-nordic hover:text-mosque hover:bg-mosque/5 rounded-xl transition-colors"
               >
                 <span className="material-icons text-base text-mosque">apartment</span>
-                <span>Gestión de Propiedades</span>
+                <span>{dictionary?.navbar?.admin_properties || (activeLocale === 'es' ? 'Gestión de Propiedades' : activeLocale === 'fr' ? 'Gestion des Propriétés' : 'Property Management')}</span>
               </Link>
               <Link
                 href="/admin/usuarios"
@@ -170,7 +234,7 @@ export default function AdminUserNav() {
                 className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-nordic hover:text-mosque hover:bg-mosque/5 rounded-xl transition-colors"
               >
                 <span className="material-icons text-base text-mosque">group</span>
-                <span>Directorio de Usuarios</span>
+                <span>{dictionary?.navbar?.admin_users || (activeLocale === 'es' ? 'Directorio de Usuarios' : activeLocale === 'fr' ? 'Annuaire des Utilisateurs' : 'User Directory')}</span>
               </Link>
               <Link
                 href="/"
@@ -178,7 +242,7 @@ export default function AdminUserNav() {
                 className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-nordic hover:text-mosque hover:bg-mosque/5 rounded-xl transition-colors sm:hidden"
               >
                 <span className="material-icons text-base text-mosque">open_in_new</span>
-                <span>Ver Sitio Web</span>
+                <span>{activeLocale === 'es' ? 'Ver Sitio Web' : activeLocale === 'fr' ? 'Voir le Site' : 'View Website'}</span>
               </Link>
             </div>
 
@@ -193,12 +257,12 @@ export default function AdminUserNav() {
                 {isSigningOut ? (
                   <>
                     <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
-                    <span>Cerrando sesión...</span>
+                    <span>{activeLocale === 'es' ? 'Cerrando sesión...' : activeLocale === 'fr' ? 'Déconnexion...' : 'Signing out...'}</span>
                   </>
                 ) : (
                   <>
                     <span className="material-icons text-base">logout</span>
-                    <span>Cerrar Sesión</span>
+                    <span>{dictionary?.navbar?.logout || (activeLocale === 'es' ? 'Cerrar Sesión' : activeLocale === 'fr' ? 'Déconnexion' : 'Sign Out')}</span>
                   </>
                 )}
               </button>

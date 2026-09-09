@@ -1,9 +1,13 @@
 import { supabase } from '@/lib/supabase';
+import { getLocale, getDictionary } from '@/lib/i18n';
 import AdminPropertiesManager, { PropertyItem } from '@/components/admin/AdminPropertiesManager';
 
 export const revalidate = 0;
 
 export default async function AdminPropertiesPage() {
+  const locale = await getLocale();
+  const dictionary = await getDictionary(locale);
+
   const { data: properties } = await supabase
     .from('properties')
     .select('*')
@@ -27,5 +31,11 @@ export default async function AdminPropertiesPage() {
     created_at: p.created_at,
   }));
 
-  return <AdminPropertiesManager initialProperties={initialProperties} />;
+  return (
+    <AdminPropertiesManager
+      initialProperties={initialProperties}
+      dictionary={dictionary}
+      currentLocale={locale}
+    />
+  );
 }

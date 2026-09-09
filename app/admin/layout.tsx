@@ -1,11 +1,15 @@
 import Link from 'next/link';
 import AdminUserNav from '@/components/admin/AdminUserNav';
+import { getLocale, getDictionary } from '@/lib/i18n';
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const locale = await getLocale();
+  const dictionary = await getDictionary(locale);
+
   return (
     <div className="min-h-screen bg-background-light font-display text-nordic flex flex-col antialiased">
       {/* Admin Top Navigation */}
@@ -34,20 +38,20 @@ export default function AdminLayout({
                   className="px-3.5 py-2 rounded-lg text-sm font-medium text-nordic hover:text-mosque hover:bg-mosque/5 transition-colors flex items-center gap-2"
                 >
                   <span className="material-icons text-lg">apartment</span>
-                  <span>Propiedades</span>
+                  <span>{dictionary?.navbar?.admin_properties || 'Propiedades'}</span>
                 </Link>
                 <Link
                   href="/admin/usuarios"
                   className="px-3.5 py-2 rounded-lg text-sm font-medium text-nordic hover:text-mosque hover:bg-mosque/5 transition-colors flex items-center gap-2"
                 >
                   <span className="material-icons text-lg">group</span>
-                  <span>Usuarios</span>
+                  <span>{dictionary?.navbar?.admin_users || 'Usuarios'}</span>
                 </Link>
               </nav>
             </div>
 
-            {/* Right side: User profile, notifications, web link and sign out */}
-            <AdminUserNav />
+            {/* Right side: User profile, notifications, language switcher and sign out */}
+            <AdminUserNav currentLocale={locale} dictionary={dictionary} />
           </div>
         </div>
       </header>

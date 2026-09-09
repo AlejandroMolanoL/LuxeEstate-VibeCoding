@@ -34,7 +34,9 @@ function mapRow(row: Record<string, unknown>): Property {
     pricePeriod: row.price_period as string | undefined,
     beds: Number(row.beds),
     baths: Number(row.baths),
+    parking: row.parking ? Number(row.parking) : undefined,
     area: row.area as string,
+    yearBuilt: row.year_built ? Number(row.year_built) : undefined,
     images: (Array.isArray(row.images) && row.images.length > 0)
       ? (row.images as string[])
       : ['/placeholder.jpg'],
