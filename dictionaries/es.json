@@ -177,7 +177,15 @@
     "of": "de",
     "results": "resultados",
     "previous": "Anterior",
-    "next": "Siguiente"
+    "next": "Siguiente",
+    "preview_title": "Visual de la Propiedad",
+    "view_full_page": "Ver página web completa",
+    "close": "Cerrar",
+    "quick_preview": "Vista Previa Rápida",
+    "parking": "Estacionamiento",
+    "year_built": "Año de Construcción",
+    "no_images": "Sin imágenes registradas",
+    "no_description": "Sin descripción proporcionada."
   },
   "admin_form": {
     "add_new_title": "Nueva Propiedad",

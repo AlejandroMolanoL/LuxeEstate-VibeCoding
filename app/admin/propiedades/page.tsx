@@ -29,6 +29,12 @@ export default async function AdminPropertiesPage() {
     listing_type: p.listing_type || 'FOR SALE',
     category: p.category,
     created_at: p.created_at,
+    description: p.description,
+    amenities: p.amenities,
+    parking: p.parking,
+    year_built: p.year_built,
+    badge: p.badge,
+    is_featured: p.is_featured,
   }));
 
   return (

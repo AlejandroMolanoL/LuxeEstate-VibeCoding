@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { deletePropertyAction } from '@/app/admin/propiedades/actions';
+import PropertyPreviewModal from './PropertyPreviewModal';
 
 export interface PropertyItem {
   id: string;
@@ -20,6 +21,12 @@ export interface PropertyItem {
   listing_type: 'FOR SALE' | 'FOR RENT' | 'SOLD';
   category?: string;
   created_at?: string;
+  parking?: number;
+  year_built?: number;
+  badge?: string;
+  description?: string;
+  amenities?: string[];
+  is_featured?: boolean;
   [key: string]: unknown;
 }
 
@@ -40,6 +47,8 @@ export default function AdminPropertiesManager({
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
+  const [previewProperty, setPreviewProperty] = useState<PropertyItem | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const pageSize = 6;
 
   useEffect(() => {
@@ -417,14 +426,17 @@ export default function AdminPropertiesManager({
 
                   {/* Actions */}
                   <div className="col-span-12 md:col-span-2 flex items-center justify-end gap-1.5">
-                    <Link
-                      href={`/propiedades/${item.id}`}
-                      target="_blank"
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPreviewProperty(item);
+                        setIsPreviewOpen(true);
+                      }}
                       className="p-2 rounded-lg text-nordic/50 hover:text-mosque hover:bg-mosque/10 transition-all cursor-pointer"
-                      title={t?.view_live || 'Ver Propiedad en Vivo'}
+                      title={t?.preview_title || t?.view_live || 'Visual de la Propiedad'}
                     >
                       <span className="material-icons text-lg">visibility</span>
-                    </Link>
+                    </button>
                     <Link
                       href={`/admin/propiedades/${item.id}/editar`}
                       className="p-2 rounded-lg text-nordic/50 hover:text-mosque hover:bg-hint-green/40 transition-all cursor-pointer inline-flex items-center justify-center"
@@ -530,6 +542,14 @@ export default function AdminPropertiesManager({
           </div>
         )}
       </div>
+
+      {/* Property Visual Preview Modal */}
+      <PropertyPreviewModal
+        property={previewProperty}
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        dictionary={dictionary}
+      />
     </main>
   );
 }

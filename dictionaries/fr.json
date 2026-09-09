@@ -177,7 +177,15 @@
     "of": "sur",
     "results": "résultats",
     "previous": "Précédent",
-    "next": "Suivant"
+    "next": "Suivant",
+    "preview_title": "Aperçu Visuel de la Propriété",
+    "view_full_page": "Voir la page web complète",
+    "close": "Fermer",
+    "quick_preview": "Aperçu Rapide",
+    "parking": "Parking",
+    "year_built": "Année de Construction",
+    "no_images": "Aucune image enregistrée",
+    "no_description": "Aucune description fournie."
   },
   "admin_form": {
     "add_new_title": "Ajouter une Nouvelle Propriété",

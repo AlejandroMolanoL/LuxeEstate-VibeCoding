@@ -177,7 +177,15 @@
     "of": "of",
     "results": "results",
     "previous": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "preview_title": "Property Visual Preview",
+    "view_full_page": "View Full Web Page",
+    "close": "Close",
+    "quick_preview": "Quick Preview",
+    "parking": "Parking",
+    "year_built": "Year Built",
+    "no_images": "No images available",
+    "no_description": "No description provided."
   },
   "admin_form": {
     "add_new_title": "Add New Property",

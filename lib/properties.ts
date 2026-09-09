@@ -114,35 +114,37 @@ export async function getFeaturedProperties(): Promise<Property[]> {
   return (data ?? []).map(mapRow);
 }
 
-export async function getPropertyBySlug(slug: string): Promise<Property | null> {
-  const { data, error } = await supabase
+export async function getPropertyBySlug(slugOrId: string): Promise<Property | null> {
+  const decoded = decodeURIComponent(slugOrId);
+
+  // 1. Try fetching by slug first
+  const { data: slugData, error: slugError } = await supabase
     .from('properties')
     .select('*')
-    .eq('slug', slug)
-    .single();
+    .eq('slug', decoded)
+    .maybeSingle();
 
-  if (error) {
-    // 42703: column does not exist (meaning migration hasn't run yet)
-    if (error.code === '42703') {
-      const { data: fallbackData, error: fallbackError } = await supabase
-        .from('properties')
-        .select('*')
-        .eq('id', slug)
-        .single();
-        
-      if (!fallbackError && fallbackData) {
-        return mapRow(fallbackData);
-      }
-      return null;
-    }
-    
-    if (error.code !== 'PGRST116') { // PGRST116 is "Results contain 0 rows"
-      console.error('Error fetching property by slug:', error.message);
-    }
-    return null;
+  if (slugData) {
+    return mapRow(slugData);
   }
 
-  if (!data) return null;
+  // 2. If not found by slug, fallback to fetching by id
+  const { data: idData, error: idError } = await supabase
+    .from('properties')
+    .select('*')
+    .eq('id', decoded)
+    .maybeSingle();
 
-  return mapRow(data);
+  if (idData) {
+    return mapRow(idData);
+  }
+
+  if (slugError && slugError.code !== 'PGRST116' && slugError.code !== '42703') {
+    console.error('Error fetching property by slug:', slugError.message);
+  }
+  if (idError && idError.code !== 'PGRST116') {
+    console.error('Error fetching property by id:', idError.message);
+  }
+
+  return null;
 }
