@@ -19,6 +19,8 @@ export interface PropertyFormData {
   parking?: number;
   amenities: string[];
   images: string[];
+  latitude?: number;
+  longitude?: number;
 }
 
 function generateSlug(title: string, id: string): string {
@@ -77,6 +79,8 @@ export async function createPropertyAction(data: PropertyFormData) {
       amenities: data.amenities || [],
       images: data.images && data.images.length > 0 ? data.images : ['/placeholder.jpg'],
       is_featured: false,
+      latitude: data.latitude ?? null,
+      longitude: data.longitude ?? null,
     };
 
     const { error: insertError } = await supabase
@@ -136,6 +140,8 @@ export async function updatePropertyAction(id: string, data: PropertyFormData) {
       parking: Number(data.parking) || 0,
       amenities: data.amenities || [],
       images: data.images && data.images.length > 0 ? data.images : ['/placeholder.jpg'],
+      latitude: data.latitude ?? null,
+      longitude: data.longitude ?? null,
     };
 
     const { error: updateError } = await supabase

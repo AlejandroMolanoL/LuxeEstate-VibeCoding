@@ -46,6 +46,8 @@ export default function PropertyForm({
   const [address, setAddress] = useState(initialData?.address || initialData?.location || '');
   const [area, setArea] = useState(initialData?.area ? initialData.area.replace(/[^0-9.]/g, '') : '');
   const [yearBuilt, setYearBuilt] = useState<number | ''>(initialData?.yearBuilt ?? '');
+  const [latitude, setLatitude] = useState<number | ''>(initialData?.latitude ?? '');
+  const [longitude, setLongitude] = useState<number | ''>(initialData?.longitude ?? '');
   const [beds, setBeds] = useState<number>(initialData?.beds ?? 3);
   const [baths, setBaths] = useState<number>(initialData?.baths ?? 2);
   const [parking, setParking] = useState<number>(initialData?.parking ?? 1);
@@ -218,6 +220,8 @@ export default function PropertyForm({
       parking,
       amenities,
       images: images.length > 0 ? images : ['/placeholder.jpg'],
+      latitude: latitude !== '' ? Number(latitude) : undefined,
+      longitude: longitude !== '' ? Number(longitude) : undefined,
     };
 
     startTransition(async () => {
@@ -622,6 +626,56 @@ export default function PropertyForm({
                     className="w-full px-4 py-2.5 rounded-md border border-gray-200 bg-white text-nordic placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-mosque focus:border-mosque transition-all text-sm"
                   />
                 </div>
+
+                {/* Latitude & Longitude */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1" htmlFor="latitude">
+                      {t?.latitude || 'Latitud'}
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                        <span className="material-icons text-sm">my_location</span>
+                      </span>
+                      <input
+                        id="latitude"
+                        type="number"
+                        step="any"
+                        min="-90"
+                        max="90"
+                        value={latitude}
+                        onChange={(e) => setLatitude(e.target.value === '' ? '' : Number(e.target.value))}
+                        placeholder="e.g. 4.7110"
+                        className="w-full pl-9 pr-3 py-2 rounded-md border border-gray-200 bg-gray-50 text-nordic placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-mosque focus:border-mosque transition-all text-sm"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1" htmlFor="longitude">
+                      {t?.longitude || 'Longitud'}
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                        <span className="material-icons text-sm">explore</span>
+                      </span>
+                      <input
+                        id="longitude"
+                        type="number"
+                        step="any"
+                        min="-180"
+                        max="180"
+                        value={longitude}
+                        onChange={(e) => setLongitude(e.target.value === '' ? '' : Number(e.target.value))}
+                        placeholder="e.g. -74.0721"
+                        className="w-full pl-9 pr-3 py-2 rounded-md border border-gray-200 bg-gray-50 text-nordic placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-mosque focus:border-mosque transition-all text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <p className="text-[11px] text-gray-400 -mt-1 flex items-center gap-1">
+                  <span className="material-icons text-[11px]">info</span>
+                  {t?.coordinates_hint || 'Coordenadas para mostrar el mapa. Puedes obtenerlas de Google Maps.'}
+                </p>
 
                 {/* Map Preview */}
                 <div className="relative h-48 w-full rounded-lg overflow-hidden bg-gray-100 border border-gray-200 group">

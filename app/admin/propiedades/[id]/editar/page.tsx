@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/server';
 import { getLocale, getDictionary } from '@/lib/i18n';
 import PropertyForm from '@/components/admin/PropertyForm';
 import { Property, PropertyListingType, PropertyCategory } from '@/types/property';
@@ -17,6 +17,7 @@ export default async function EditPropertyPage({ params }: EditPropertyPageProps
   const locale = await getLocale();
   const dictionary = await getDictionary(locale);
 
+  const supabase = await createClient();
   const { data: row, error } = await supabase
     .from('properties')
     .select('*')
@@ -46,6 +47,8 @@ export default async function EditPropertyPage({ params }: EditPropertyPageProps
     category: (row.category || 'Apartment') as PropertyCategory,
     description: row.description || '',
     amenities: Array.isArray(row.amenities) ? row.amenities : [],
+    latitude: row.latitude ? Number(row.latitude) : undefined,
+    longitude: row.longitude ? Number(row.longitude) : undefined,
   };
 
   return (

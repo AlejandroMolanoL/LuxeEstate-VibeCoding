@@ -53,9 +53,9 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
     ? property.images 
     : ['/placeholder.jpg'];
 
-  // Mock lat/lng for map - you can add real fields to DB later
-  const lat = 37.4419;
-  const lng = -122.1430;
+  // Use real lat/lng from DB, fall back to defaults if not set
+  const lat = property.latitude ?? 37.4419;
+  const lng = property.longitude ?? -122.1430;
 
   // Ensure default amenities
   const amenities = property.amenities || [
