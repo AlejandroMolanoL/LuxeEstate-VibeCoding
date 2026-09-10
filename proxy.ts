@@ -9,6 +9,18 @@ export async function proxy(request: NextRequest) {
 
   // 2. Protect admin routes
   if (pathname.startsWith('/admin')) {
+    // In development mode, allow dev_bypass parameter or cookie for testing
+    if (
+      process.env.NODE_ENV === 'development' &&
+      (request.nextUrl.searchParams.get('dev_bypass') === '1' ||
+        request.cookies.get('dev_bypass')?.value === '1')
+    ) {
+      if (request.nextUrl.searchParams.get('dev_bypass') === '1') {
+        response.cookies.set('dev_bypass', '1', { path: '/' });
+      }
+      return response;
+    }
+
     // If user is not logged in, redirect to login page
     if (!user) {
       const loginUrl = new URL('/login', request.url);

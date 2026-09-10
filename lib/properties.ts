@@ -48,6 +48,8 @@ function mapRow(row: Record<string, unknown>): Property {
     slug: (row.slug as string | undefined) || (row.id as string),
     description: row.description as string | undefined,
     amenities: row.amenities as string[] | undefined,
+    latitude: row.latitude ? Number(row.latitude) : undefined,
+    longitude: row.longitude ? Number(row.longitude) : undefined,
   };
 }
 

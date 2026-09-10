@@ -23,4 +23,6 @@ export interface Property {
   isFeatured?: boolean;
   description?: string;
   amenities?: string[];
+  latitude?: number;
+  longitude?: number;
 }

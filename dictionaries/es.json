@@ -142,6 +142,7 @@
   "map": {
     "location": "Ubicación",
     "not_available": "Vista del mapa no disponible para",
+    "drag_instruction": "Arrastra el pin o haz clic en el mapa para moverlo.",
     "loading_map": "Cargando mapa...",
     "view_on_maps": "Ver en Google Maps"
   },
@@ -235,6 +236,13 @@
     "bathrooms": "Baños",
     "parking": "Estacionamiento",
     "amenities": "Amenidades",
+    "map_preview_title": "Ubicación en el Mapa",
+    "map_drag_instruction": "Arrastra el marcador o haz clic en el mapa para ajustar la posición",
+    "map_placeholder_title": "Mapa interactivo de Leaflet",
+    "map_placeholder_desc": "Ingresa la latitud y longitud en los campos superiores para visualizar y ajustar la ubicación exacta en el mapa.",
+    "map_missing_longitude": "Falta ingresar la longitud para visualizar el mapa.",
+    "map_missing_latitude": "Falta ingresar la latitud para visualizar el mapa.",
+    "use_current_location": "Obtener ubicación actual",
     "success_create": "¡Propiedad creada exitosamente!",
     "success_update": "¡Propiedad actualizada correctamente!"
   }

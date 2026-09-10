@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Property, PropertyListingType, PropertyCategory } from '@/types/property';
 import { uploadPropertyImage } from '@/lib/supabase/storage';
 import { createPropertyAction, updatePropertyAction } from '@/app/admin/propiedades/actions';
+import PropertyMap from '@/components/property/PropertyMap';
 
 interface PropertyFormProps {
   mode: 'create' | 'edit';
@@ -44,6 +45,8 @@ export default function PropertyForm({
   const [category, setCategory] = useState<PropertyCategory>(initialData?.category || 'Apartment');
   const [description, setDescription] = useState(initialData?.description || '');
   const [address, setAddress] = useState(initialData?.address || initialData?.location || '');
+  const [latitude, setLatitude] = useState<number | ''>(initialData?.latitude ?? '');
+  const [longitude, setLongitude] = useState<number | ''>(initialData?.longitude ?? '');
   const [area, setArea] = useState(initialData?.area ? initialData.area.replace(/[^0-9.]/g, '') : '');
   const [yearBuilt, setYearBuilt] = useState<number | ''>(initialData?.yearBuilt ?? '');
   const [beds, setBeds] = useState<number>(initialData?.beds ?? 3);
@@ -218,6 +221,8 @@ export default function PropertyForm({
       parking,
       amenities,
       images: images.length > 0 ? images : ['/placeholder.jpg'],
+      latitude: latitude !== '' ? Number(latitude) : undefined,
+      longitude: longitude !== '' ? Number(longitude) : undefined,
     };
 
     startTransition(async () => {
@@ -623,19 +628,142 @@ export default function PropertyForm({
                   />
                 </div>
 
-                {/* Map Preview */}
-                <div className="relative h-48 w-full rounded-lg overflow-hidden bg-gray-100 border border-gray-200 group">
-                  <img
-                    alt="Map view of city streets"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAS55FY7gfArnlTpNsdabJk9nBO5uQJgOwIsl8beO34JRZ9dMmjLoIkTuTUO72Y9L5tUmQqTReQWebUWadAWwLusGmRQiIict5sqY--yRaOxuYpTzfR4vv4RKh1ex6oxY64e0kbSeMudNO6pv-gG0WzVWs-pDfvQm5IoTQ1mT-tAV49LDkXAHZl317M1-D7eZw3N8o2ExKWTgg6oMAXOFVnkApIqnb7TZHekwSw8pWQxpJV2EKI8EQKQbQXJaSbjN8gB1n8b-ueWj8"
-                    className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-500"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <span className="bg-white/90 text-nordic px-3 py-1.5 rounded shadow-sm backdrop-blur-sm text-xs font-bold flex items-center gap-1">
-                      <span className="material-icons text-sm text-mosque">map</span> {t?.preview || 'Preview'}
+                {/* Latitude & Longitude Coordinates */}
+                <div className="space-y-2 pt-1 border-t border-gray-100">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-nordic flex items-center gap-1">
+                      <span className="material-icons text-mosque text-sm">my_location</span>
+                      {currentLocale === 'es' ? 'Coordenadas GPS' : 'GPS Coordinates'}
+                    </span>
+                    <span className="text-[10px] text-gray-400 font-normal">
+                      {currentLocale === 'es' ? 'Opcional' : 'Optional'}
                     </span>
                   </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-nordic mb-1" htmlFor="latitude">
+                        {t?.latitude || 'Latitud'}
+                      </label>
+                      <input
+                        id="latitude"
+                        type="number"
+                        step="any"
+                        value={latitude}
+                        onChange={(e) => setLatitude(e.target.value === '' ? '' : Number(e.target.value))}
+                        placeholder={t?.latitude_placeholder || 'ej. 25.7617'}
+                        className="w-full px-3 py-2 rounded-md border border-gray-200 bg-white text-nordic placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-mosque focus:border-mosque transition-all text-sm font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-nordic mb-1" htmlFor="longitude">
+                        {t?.longitude || 'Longitud'}
+                      </label>
+                      <input
+                        id="longitude"
+                        type="number"
+                        step="any"
+                        value={longitude}
+                        onChange={(e) => setLongitude(e.target.value === '' ? '' : Number(e.target.value))}
+                        placeholder={t?.longitude_placeholder || 'ej. -80.1918'}
+                        className="w-full px-3 py-2 rounded-md border border-gray-200 bg-white text-nordic placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-mosque focus:border-mosque transition-all text-sm font-mono"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-gray-400 leading-tight">
+                    {currentLocale === 'es'
+                      ? 'Coordenadas para posicionar el pin de la propiedad en el mapa interactivo.'
+                      : 'Coordinates to pinpoint the property on the interactive map.'}
+                  </p>
                 </div>
+
+                {/* Map Preview / Interactive Leaflet Map */}
+                {(() => {
+                  const latNum = latitude !== '' ? Number(latitude) : NaN;
+                  const lngNum = longitude !== '' ? Number(longitude) : NaN;
+                  const hasValidCoords =
+                    latitude !== '' &&
+                    longitude !== '' &&
+                    !isNaN(latNum) &&
+                    !isNaN(lngNum) &&
+                    latNum >= -90 &&
+                    latNum <= 90 &&
+                    lngNum >= -180 &&
+                    lngNum <= 180;
+
+                  if (hasValidCoords) {
+                    return (
+                      <div className="space-y-2 pt-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-semibold text-nordic flex items-center gap-1.5">
+                            <span className="material-icons text-mosque text-sm">map</span>
+                            {t?.map_preview_title || (currentLocale === 'es' ? 'Ubicación en el Mapa' : 'Map Location')}
+                          </span>
+                          <span className="text-[10px] text-gray-400">
+                            {t?.map_drag_instruction || (currentLocale === 'es' ? 'Arrastra el pin para ajustar' : 'Drag pin to adjust')}
+                          </span>
+                        </div>
+                        <PropertyMap
+                          lat={latNum}
+                          lng={lngNum}
+                          address={address || title || (currentLocale === 'es' ? 'Ubicación de la propiedad' : 'Property Location')}
+                          dictionary={dictionary}
+                          interactive={true}
+                          onLocationChange={(newLat, newLng) => {
+                            setLatitude(newLat);
+                            setLongitude(newLng);
+                          }}
+                          heightClassName="h-56 w-full"
+                          className="relative z-0 rounded-lg overflow-hidden border border-gray-200 shadow-sm"
+                        />
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div className="h-56 w-full rounded-lg border-2 border-dashed border-gray-200 bg-gray-50/70 p-5 flex flex-col items-center justify-center text-center transition-colors">
+                      <div className="w-10 h-10 rounded-full bg-hint-green flex items-center justify-center text-nordic mb-2.5 shadow-xs">
+                        <span className="material-icons text-xl text-mosque">place</span>
+                      </div>
+                      <p className="text-xs font-semibold text-nordic mb-1">
+                        {t?.map_placeholder_title || (currentLocale === 'es' ? 'Mapa interactivo de Leaflet' : 'Interactive Leaflet Map')}
+                      </p>
+                      <p className="text-[11px] text-gray-500 max-w-[260px] leading-relaxed mb-3">
+                        {latitude !== '' && longitude === ''
+                          ? (t?.map_missing_longitude || (currentLocale === 'es' ? 'Falta ingresar la longitud para visualizar el mapa.' : 'Please enter longitude to display the map.'))
+                          : latitude === '' && longitude !== ''
+                          ? (t?.map_missing_latitude || (currentLocale === 'es' ? 'Falta ingresar la latitud para visualizar el mapa.' : 'Please enter latitude to display the map.'))
+                          : (t?.map_placeholder_desc || (currentLocale === 'es'
+                            ? 'Ingresa la latitud y longitud en los campos superiores para visualizar y ajustar la ubicación exacta en el mapa.'
+                            : 'Enter latitude and longitude above to display and adjust the exact location on the map.'))}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (typeof window !== 'undefined' && 'geolocation' in navigator) {
+                            navigator.geolocation.getCurrentPosition(
+                              (pos) => {
+                                setLatitude(Number(pos.coords.latitude.toFixed(6)));
+                                setLongitude(Number(pos.coords.longitude.toFixed(6)));
+                              },
+                              () => {
+                                setLatitude(25.7617);
+                                setLongitude(-80.1918);
+                              }
+                            );
+                          } else {
+                            setLatitude(25.7617);
+                            setLongitude(-80.1918);
+                          }
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-mosque bg-white border border-mosque/20 rounded-md hover:bg-hint-green/30 transition-colors shadow-xs cursor-pointer"
+                      >
+                        <span className="material-icons text-sm">my_location</span>
+                        <span>{t?.use_current_location || (currentLocale === 'es' ? 'Obtener ubicación actual' : 'Use current location')}</span>
+                      </button>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
 

@@ -27,6 +27,8 @@ export interface PropertyItem {
   description?: string;
   amenities?: string[];
   is_featured?: boolean;
+  latitude?: number;
+  longitude?: number;
   [key: string]: unknown;
 }
 

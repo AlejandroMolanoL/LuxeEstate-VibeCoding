@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/server';
 import { getLocale, getDictionary } from '@/lib/i18n';
 import AdminPropertiesManager, { PropertyItem } from '@/components/admin/AdminPropertiesManager';
 
@@ -8,6 +8,7 @@ export default async function AdminPropertiesPage() {
   const locale = await getLocale();
   const dictionary = await getDictionary(locale);
 
+  const supabase = await createClient();
   const { data: properties } = await supabase
     .from('properties')
     .select('*')
@@ -35,6 +36,8 @@ export default async function AdminPropertiesPage() {
     year_built: p.year_built,
     badge: p.badge,
     is_featured: p.is_featured,
+    latitude: p.latitude ? Number(p.latitude) : undefined,
+    longitude: p.longitude ? Number(p.longitude) : undefined,
   }));
 
   return (
