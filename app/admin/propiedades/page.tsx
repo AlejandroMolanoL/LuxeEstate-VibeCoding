@@ -36,6 +36,8 @@ export default async function AdminPropertiesPage() {
     year_built: p.year_built,
     badge: p.badge,
     is_featured: p.is_featured,
+    latitude: p.latitude ? Number(p.latitude) : undefined,
+    longitude: p.longitude ? Number(p.longitude) : undefined,
   }));
 
   return (
