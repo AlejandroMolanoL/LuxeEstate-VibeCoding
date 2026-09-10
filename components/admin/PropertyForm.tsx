@@ -49,8 +49,6 @@ export default function PropertyForm({
   const [longitude, setLongitude] = useState<number | ''>(initialData?.longitude ?? '');
   const [area, setArea] = useState(initialData?.area ? initialData.area.replace(/[^0-9.]/g, '') : '');
   const [yearBuilt, setYearBuilt] = useState<number | ''>(initialData?.yearBuilt ?? '');
-  const [latitude, setLatitude] = useState<number | ''>(initialData?.latitude ?? '');
-  const [longitude, setLongitude] = useState<number | ''>(initialData?.longitude ?? '');
   const [beds, setBeds] = useState<number>(initialData?.beds ?? 3);
   const [baths, setBaths] = useState<number>(initialData?.baths ?? 2);
   const [parking, setParking] = useState<number>(initialData?.parking ?? 1);
