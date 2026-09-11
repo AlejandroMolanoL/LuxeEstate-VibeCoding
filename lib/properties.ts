@@ -45,6 +45,7 @@ function mapRow(row: Record<string, unknown>): Property {
     listingType: row.listing_type as PropertyListingType,
     category: row.category as PropertyCategory,
     isFeatured: Boolean(row.is_featured),
+    isActive: row.is_active !== false,
     slug: (row.slug as string | undefined) || (row.id as string),
     description: row.description as string | undefined,
     amenities: row.amenities as string[] | undefined,
@@ -64,6 +65,7 @@ export async function getProperties(
   let query = supabase
     .from('properties')
     .select('*', { count: 'exact' })
+    .eq('is_active', true)
     .order('created_at', { ascending: true });
 
   if (filters.filter === 'Buy') {
@@ -106,6 +108,7 @@ export async function getFeaturedProperties(): Promise<Property[]> {
     .from('properties')
     .select('*')
     .eq('is_featured', true)
+    .eq('is_active', true)
     .order('created_at', { ascending: true });
 
   if (error) {

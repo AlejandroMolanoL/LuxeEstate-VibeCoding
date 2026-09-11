@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { deletePropertyAction } from '@/app/admin/propiedades/actions';
+import { deactivatePropertyAction, reactivatePropertyAction } from '@/app/admin/propiedades/actions';
 import PropertyPreviewModal from './PropertyPreviewModal';
 
 export interface PropertyItem {
@@ -27,6 +27,7 @@ export interface PropertyItem {
   description?: string;
   amenities?: string[];
   is_featured?: boolean;
+  is_active?: boolean;
   latitude?: number;
   longitude?: number;
   [key: string]: unknown;
@@ -45,10 +46,10 @@ export default function AdminPropertiesManager({
 }: AdminPropertiesManagerProps) {
   const t = dictionary?.admin_properties;
   const [propertiesList, setPropertiesList] = useState<PropertyItem[]>(initialProperties);
-  const [filterType, setFilterType] = useState<'ALL' | 'FOR SALE' | 'FOR RENT'>('ALL');
+  const [filterType, setFilterType] = useState<'ALL' | 'FOR SALE' | 'FOR RENT' | 'INACTIVE'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
+  const [isTogglingId, setIsTogglingId] = useState<string | null>(null);
   const [previewProperty, setPreviewProperty] = useState<PropertyItem | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const pageSize = 6;
@@ -57,42 +58,58 @@ export default function AdminPropertiesManager({
     setPropertiesList(initialProperties);
   }, [initialProperties]);
 
-  const handleDelete = async (id: string, title: string) => {
-    const confirmText = (t?.delete_confirm || '¿Estás seguro de eliminar la propiedad "{title}"?').replace(
-      '{title}',
-      title
-    );
+  const handleToggleActive = async (id: string, title: string, currentlyActive: boolean) => {
+    const action = currentlyActive ? 'desactivar' : 'reactivar';
+    const confirmText = `¿Estás seguro de ${action} la propiedad "${title}"?`;
     if (!window.confirm(confirmText)) {
       return;
     }
 
-    setIsDeletingId(id);
-    const res = await deletePropertyAction(id);
+    setIsTogglingId(id);
+    const res = currentlyActive
+      ? await deactivatePropertyAction(id)
+      : await reactivatePropertyAction(id);
+
     if (res.success) {
-      setPropertiesList((prev) => prev.filter((p) => p.id !== id));
+      setPropertiesList((prev) =>
+        prev.map((p) => (p.id === id ? { ...p, is_active: !currentlyActive } : p))
+      );
     } else {
-      alert(res.error || 'No se pudo eliminar la propiedad');
+      alert(res.error || `No se pudo ${action} la propiedad`);
     }
-    setIsDeletingId(null);
+    setIsTogglingId(null);
   };
 
   // Compute stat totals
-  const totalCount = propertiesList.length;
+  const totalCount = propertiesList.filter((p) => p.is_active !== false).length;
   const forSaleCount = useMemo(
-    () => propertiesList.filter((p) => p.listing_type === 'FOR SALE').length,
+    () => propertiesList.filter((p) => p.listing_type === 'FOR SALE' && p.is_active !== false).length,
     [propertiesList]
   );
   const forRentCount = useMemo(
-    () => propertiesList.filter((p) => p.listing_type === 'FOR RENT').length,
+    () => propertiesList.filter((p) => p.listing_type === 'FOR RENT' && p.is_active !== false).length,
+    [propertiesList]
+  );
+  const inactiveCount = useMemo(
+    () => propertiesList.filter((p) => p.is_active === false).length,
     [propertiesList]
   );
 
   // Filter properties by tab and search query
   const filteredProperties = useMemo(() => {
     return propertiesList.filter((property) => {
+      const isActive = property.is_active !== false;
+
       // Filter by quick tab
-      if (filterType !== 'ALL' && property.listing_type !== filterType) {
-        return false;
+      if (filterType === 'INACTIVE') {
+        if (isActive) return false;
+      } else if (filterType === 'ALL') {
+        // ALL shows only active properties
+        if (!isActive) return false;
+      } else {
+        // FOR SALE / FOR RENT: only active
+        if (!isActive) return false;
+        if (property.listing_type !== filterType) return false;
       }
 
       // Filter by search query
@@ -121,7 +138,7 @@ export default function AdminPropertiesManager({
   const startRecord = totalResults === 0 ? 0 : (safeCurrentPage - 1) * pageSize + 1;
   const endRecord = Math.min(safeCurrentPage * pageSize, totalResults);
 
-  const handleFilterChange = (type: 'ALL' | 'FOR SALE' | 'FOR RENT') => {
+  const handleFilterChange = (type: 'ALL' | 'FOR SALE' | 'FOR RENT' | 'INACTIVE') => {
     setFilterType(type);
     setCurrentPage(1);
   };
@@ -168,9 +185,9 @@ export default function AdminPropertiesManager({
         </div>
       </div>
 
-      {/* Quick Filter Buttons / Stats Overview matching attached design */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
-        {/* Total Propiedades */}
+      {/* Quick Filter Buttons / Stats Overview */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-5 mb-8">
+        {/* Total Propiedades Activas */}
         <button
           type="button"
           onClick={() => handleFilterChange('ALL')}
@@ -183,7 +200,7 @@ export default function AdminPropertiesManager({
           <div>
             <div className="flex items-center gap-2">
               <p className="text-[11px] font-bold text-nordic/60 uppercase tracking-wider">
-                {t?.total_properties || 'Total Propiedades'}
+                {t?.total_properties || 'Total Activas'}
               </p>
               {filterType === 'ALL' && (
                 <span className="bg-mosque text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase">
@@ -271,6 +288,40 @@ export default function AdminPropertiesManager({
             <span className="material-icons text-2xl">key</span>
           </div>
         </button>
+
+        {/* Inactivas */}
+        <button
+          type="button"
+          onClick={() => handleFilterChange('INACTIVE')}
+          className={`bg-white text-left p-5 rounded-2xl border transition-all duration-200 cursor-pointer flex items-center justify-between shadow-sm hover:shadow-md ${
+            filterType === 'INACTIVE'
+              ? 'ring-2 ring-gray-500 border-gray-500 shadow-md bg-gray-50/50'
+              : 'border-nordic/10 hover:border-gray-400/40'
+          }`}
+        >
+          <div>
+            <div className="flex items-center gap-2">
+              <p className="text-[11px] font-bold text-nordic/60 uppercase tracking-wider">
+                Inactivas
+              </p>
+              {filterType === 'INACTIVE' && (
+                <span className="bg-gray-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase">
+                  Activo
+                </span>
+              )}
+            </div>
+            <p className="text-3xl font-bold text-nordic mt-1">{inactiveCount}</p>
+          </div>
+          <div
+            className={`h-12 w-12 rounded-xl flex items-center justify-center transition-colors ${
+              filterType === 'INACTIVE'
+                ? 'bg-gray-500 text-white shadow-soft'
+                : 'bg-gray-100 text-gray-500'
+            }`}
+          >
+            <span className="material-icons text-2xl">visibility_off</span>
+          </div>
+        </button>
       </div>
 
       {/* Search & Filter Bar */}
@@ -346,10 +397,16 @@ export default function AdminPropertiesManager({
                   ? (t?.sold || 'Vendida')
                   : (t?.for_rent || 'En Alquiler');
 
+              const isActive = item.is_active !== false;
+
               return (
                 <div
                   key={item.id}
-                  className="group grid grid-cols-1 md:grid-cols-12 gap-4 px-6 py-4 hover:bg-background-light/60 transition-colors items-center"
+                  className={`group grid grid-cols-1 md:grid-cols-12 gap-4 px-6 py-4 transition-colors items-center ${
+                    isActive
+                      ? 'hover:bg-background-light/60'
+                      : 'bg-gray-50/80 opacity-70 hover:opacity-90'
+                  }`}
                 >
                   {/* Property Details */}
                   <div className="col-span-12 md:col-span-6 flex gap-4 items-center">
@@ -361,11 +418,21 @@ export default function AdminPropertiesManager({
                       />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-base font-bold text-nordic truncate group-hover:text-mosque transition-colors">
-                        <Link href={`/propiedades/${item.id}`}>
-                          {item.title}
-                        </Link>
-                      </h3>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className={`text-base font-bold truncate transition-colors ${
+                          isActive ? 'text-nordic group-hover:text-mosque' : 'text-gray-500'
+                        }`}>
+                          <Link href={`/propiedades/${item.id}`}>
+                            {item.title}
+                          </Link>
+                        </h3>
+                        {!isActive && (
+                          <span className="inline-flex items-center gap-1 bg-gray-200 text-gray-600 text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase flex-shrink-0">
+                            <span className="material-icons text-[10px]">visibility_off</span>
+                            Inactiva
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-nordic/60 truncate mt-0.5">
                         {item.location || item.address}
                       </p>
@@ -448,15 +515,21 @@ export default function AdminPropertiesManager({
                     </Link>
                     <button
                       type="button"
-                      onClick={() => handleDelete(item.id, item.title)}
-                      disabled={isDeletingId === item.id}
-                      className="p-2 rounded-lg text-nordic/50 hover:text-red-600 hover:bg-red-50 transition-all cursor-pointer disabled:opacity-40"
-                      title={t?.delete_property || 'Eliminar Propiedad'}
+                      onClick={() => handleToggleActive(item.id, item.title, isActive)}
+                      disabled={isTogglingId === item.id}
+                      className={`p-2 rounded-lg transition-all cursor-pointer disabled:opacity-40 ${
+                        isActive
+                          ? 'text-nordic/50 hover:text-amber-600 hover:bg-amber-50'
+                          : 'text-green-600 hover:text-green-700 hover:bg-green-50'
+                      }`}
+                      title={isActive ? 'Desactivar Propiedad' : 'Reactivar Propiedad'}
                     >
-                      {isDeletingId === item.id ? (
+                      {isTogglingId === item.id ? (
                         <span className="material-icons text-lg animate-spin">refresh</span>
                       ) : (
-                        <span className="material-icons text-lg">delete_outline</span>
+                        <span className="material-icons text-lg">
+                          {isActive ? 'toggle_on' : 'toggle_off'}
+                        </span>
                       )}
                     </button>
                   </div>

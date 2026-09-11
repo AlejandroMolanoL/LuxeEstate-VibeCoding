@@ -78,11 +78,9 @@ export async function createPropertyAction(data: PropertyFormData) {
       parking: Number(data.parking) || 0,
       amenities: data.amenities || [],
       images: data.images && data.images.length > 0 ? data.images : ['/placeholder.jpg'],
-      latitude: data.latitude !== undefined && data.latitude !== null ? Number(data.latitude) : null,
-      longitude: data.longitude !== undefined && data.longitude !== null ? Number(data.longitude) : null,
-      is_featured: false,
       latitude: data.latitude ?? null,
       longitude: data.longitude ?? null,
+      is_featured: false,
     };
 
     const { error: insertError } = await supabase
@@ -168,9 +166,10 @@ export async function updatePropertyAction(id: string, data: PropertyFormData) {
 }
 
 /**
- * Deletes a property by its ID.
+ * Deactivates a property (soft delete) by setting is_active = false.
+ * The property remains in the database and visible in the admin panel.
  */
-export async function deletePropertyAction(id: string) {
+export async function deactivatePropertyAction(id: string) {
   try {
     const supabase = await createClient();
 
@@ -180,17 +179,17 @@ export async function deletePropertyAction(id: string) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return { success: false, error: 'Debes iniciar sesión para eliminar propiedades.' };
+      return { success: false, error: 'Debes iniciar sesión para desactivar propiedades.' };
     }
 
-    const { error: deleteError } = await supabase
+    const { error: updateError } = await supabase
       .from('properties')
-      .delete()
+      .update({ is_active: false })
       .eq('id', id);
 
-    if (deleteError) {
-      console.error('Error deleting property:', deleteError.message);
-      return { success: false, error: deleteError.message };
+    if (updateError) {
+      console.error('Error deactivating property:', updateError.message);
+      return { success: false, error: updateError.message };
     }
 
     revalidatePath('/admin/propiedades');
@@ -199,8 +198,46 @@ export async function deletePropertyAction(id: string) {
 
     return { success: true };
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Error al eliminar la propiedad';
-    console.error('Exception deleting property:', message);
+    const message = err instanceof Error ? err.message : 'Error al desactivar la propiedad';
+    console.error('Exception deactivating property:', message);
+    return { success: false, error: message };
+  }
+}
+
+/**
+ * Reactivates a previously deactivated property by setting is_active = true.
+ */
+export async function reactivatePropertyAction(id: string) {
+  try {
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return { success: false, error: 'Debes iniciar sesión para reactivar propiedades.' };
+    }
+
+    const { error: updateError } = await supabase
+      .from('properties')
+      .update({ is_active: true })
+      .eq('id', id);
+
+    if (updateError) {
+      console.error('Error reactivating property:', updateError.message);
+      return { success: false, error: updateError.message };
+    }
+
+    revalidatePath('/admin/propiedades');
+    revalidatePath('/propiedades');
+    revalidatePath('/');
+
+    return { success: true };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Error al reactivar la propiedad';
+    console.error('Exception reactivating property:', message);
     return { success: false, error: message };
   }
 }

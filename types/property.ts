@@ -21,6 +21,7 @@ export interface Property {
   listingType: PropertyListingType;
   category: PropertyCategory;
   isFeatured?: boolean;
+  isActive?: boolean;
   description?: string;
   amenities?: string[];
   latitude?: number;
