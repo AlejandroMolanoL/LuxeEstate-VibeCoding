@@ -14,6 +14,7 @@ export interface AdvancedFilters {
   amenities?: string[];
   type?: string;
   location?: string;
+  title?: string;
 }
 
 interface PropertiesResult {
@@ -84,6 +85,9 @@ export async function getProperties(
   }
   if (filters.location) {
     query = query.ilike('location', `%${filters.location}%`);
+  }
+  if (filters.title && filters.title.trim()) {
+    query = query.ilike('title', `%${filters.title.trim()}%`);
   }
 
   const { data, error, count } = await query.range(from, to);

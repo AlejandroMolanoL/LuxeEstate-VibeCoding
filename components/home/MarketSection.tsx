@@ -10,6 +10,7 @@ interface MarketSectionProps {
   totalPages: number;
   filter: FilterType;
   dictionary?: any;
+  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
 export default function MarketSection({
@@ -18,9 +19,21 @@ export default function MarketSection({
   totalPages,
   filter,
   dictionary,
+  searchParams,
 }: MarketSectionProps) {
   function filterHref(tab: FilterType) {
     const params = new URLSearchParams();
+    if (searchParams) {
+      Object.entries(searchParams).forEach(([key, val]) => {
+        if (val !== undefined && key !== 'filter' && key !== 'page') {
+          if (Array.isArray(val)) {
+            val.forEach(v => params.append(key, v));
+          } else {
+            params.set(key, val);
+          }
+        }
+      });
+    }
     if (tab !== 'All') params.set('filter', tab);
     params.set('page', '1');
     return `/?${params.toString()}`;
@@ -79,6 +92,7 @@ export default function MarketSection({
         totalPages={totalPages}
         filter={filter}
         dictionary={dictionary}
+        searchParams={searchParams}
       />
     </section>
   );

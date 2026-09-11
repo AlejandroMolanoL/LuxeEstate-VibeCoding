@@ -15,7 +15,7 @@
   "hero": {
     "title_start": "Trouvez votre",
     "title_highlight": "sanctuaire",
-    "search_placeholder": "Recherche par ville, quartier ou adresse...",
+    "search_placeholder": "Rechercher par titre de propriété...",
     "search_button": "Rechercher",
     "categories": {
       "All": "Tout",

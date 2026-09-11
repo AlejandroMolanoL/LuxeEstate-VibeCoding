@@ -15,7 +15,7 @@
   "hero": {
     "title_start": "Find your",
     "title_highlight": "sanctuary",
-    "search_placeholder": "Search by city, neighborhood, or address...",
+    "search_placeholder": "Search by property title...",
     "search_button": "Search",
     "categories": {
       "All": "All",

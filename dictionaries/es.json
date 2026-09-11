@@ -15,7 +15,7 @@
   "hero": {
     "title_start": "Encuentra tu",
     "title_highlight": "santuario",
-    "search_placeholder": "Buscar por ciudad, barrio o dirección...",
+    "search_placeholder": "Buscar por título de la propiedad...",
     "search_button": "Buscar",
     "categories": {
       "All": "Todos",

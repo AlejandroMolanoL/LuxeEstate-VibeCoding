@@ -6,6 +6,7 @@ interface PaginationControlsProps {
   totalPages: number;
   filter: FilterType;
   dictionary?: any;
+  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
 export default function PaginationControls({
@@ -13,11 +14,23 @@ export default function PaginationControls({
   totalPages,
   filter,
   dictionary,
+  searchParams,
 }: PaginationControlsProps) {
   if (totalPages <= 1) return null;
 
   function buildHref(page: number) {
     const params = new URLSearchParams();
+    if (searchParams) {
+      Object.entries(searchParams).forEach(([key, val]) => {
+        if (val !== undefined && key !== 'page') {
+          if (Array.isArray(val)) {
+            val.forEach(v => params.append(key, v));
+          } else {
+            params.set(key, val);
+          }
+        }
+      });
+    }
     if (filter !== 'All') params.set('filter', filter);
     params.set('page', String(page));
     return `/?${params.toString()}`;

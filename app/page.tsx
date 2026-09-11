@@ -10,7 +10,8 @@ interface HomeProps {
 }
 
 export default async function Home({ searchParams }: HomeProps) {
-  const { page: pageParam, filter: filterParam } = await searchParams;
+  const resolvedSearchParams = await searchParams;
+  const { page: pageParam, filter: filterParam } = resolvedSearchParams;
 
   const locale = await getLocale();
   const dictionary = await getDictionary(locale);
@@ -21,7 +22,10 @@ export default async function Home({ searchParams }: HomeProps) {
   const filterType: FilterType =
     rawFilter === 'Buy' || rawFilter === 'Rent' ? rawFilter : 'All';
 
-  const { minPrice, maxPrice, beds, baths, type, location, amenities } = await searchParams;
+  const { minPrice, maxPrice, beds, baths, type, location, amenities, title, q, search } = resolvedSearchParams;
+
+  const rawTitle = title || q || search;
+  const titleFilter = typeof rawTitle === 'string' ? rawTitle : Array.isArray(rawTitle) ? rawTitle[0] : undefined;
 
   const filters: AdvancedFilters = {
     filter: filterType,
@@ -32,6 +36,7 @@ export default async function Home({ searchParams }: HomeProps) {
     type: typeof type === 'string' ? type : undefined,
     location: typeof location === 'string' ? location : undefined,
     amenities: typeof amenities === 'string' ? amenities.split(',') : undefined,
+    title: titleFilter,
   };
 
   const [featured, market] = await Promise.all([
@@ -46,6 +51,7 @@ export default async function Home({ searchParams }: HomeProps) {
     Boolean(filters.baths) || 
     (filters.type && filters.type !== 'Any Type' && filters.type !== 'All') || 
     Boolean(filters.location) || 
+    Boolean(filters.title && filters.title.trim()) ||
     (filters.amenities && filters.amenities.length > 0) ||
     filters.filter !== 'All';
 
@@ -63,6 +69,7 @@ export default async function Home({ searchParams }: HomeProps) {
           totalPages={market.totalPages}
           filter={filterType}
           dictionary={dictionary}
+          searchParams={resolvedSearchParams}
         />
       </main>
     </div>

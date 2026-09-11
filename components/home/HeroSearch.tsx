@@ -19,7 +19,7 @@ export default function HeroSearch({ onSearch, onSelectCategory, dictionary }: H
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   useEffect(() => {
-    setSearchQuery(searchParams.get('location') || '');
+    setSearchQuery(searchParams.get('title') || searchParams.get('q') || searchParams.get('search') || '');
     setSelectedCategory(searchParams.get('type') || 'All');
   }, [searchParams]);
 
@@ -28,16 +28,19 @@ export default function HeroSearch({ onSearch, onSelectCategory, dictionary }: H
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams(searchParams.toString());
-    if (searchQuery) {
-      params.set('location', searchQuery);
+    const query = searchQuery.trim();
+    if (query) {
+      params.set('title', query);
     } else {
-      params.delete('location');
+      params.delete('title');
     }
+    params.delete('q');
+    params.delete('search');
     params.set('page', '1');
     router.push(`/?${params.toString()}`);
 
     if (onSearch) {
-      onSearch(searchQuery);
+      onSearch(query);
     }
   };
 
@@ -79,7 +82,7 @@ export default function HeroSearch({ onSearch, onSelectCategory, dictionary }: H
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={dictionary?.hero?.search_placeholder || "Search by city, neighborhood, or address..."}
+            placeholder={dictionary?.hero?.search_placeholder || "Search by property title..."}
             className="block w-full pl-12 pr-28 py-4 rounded-xl border-none bg-white text-nordic-dark shadow-soft placeholder-nordic-muted/60 focus:ring-2 focus:ring-mosque focus:bg-white transition-all text-lg outline-none"
           />
           <button
