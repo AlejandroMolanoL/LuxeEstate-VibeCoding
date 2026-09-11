@@ -3,7 +3,10 @@
 import { useState } from 'react';
 import Image from 'next/image';
 
+import { useFavorites } from '@/context/FavoritesContext';
+
 interface PropertyGalleryProps {
+  propertyId?: string;
   images: string[];
   title: string;
   badge?: string;
@@ -11,9 +14,11 @@ interface PropertyGalleryProps {
   dictionary?: any;
 }
 
-export default function PropertyGallery({ images, title, badge, listingType, dictionary }: PropertyGalleryProps) {
+export default function PropertyGallery({ propertyId, images, title, badge, listingType, dictionary }: PropertyGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
-
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const favorited = propertyId ? isFavorite(propertyId) : false;
+  
   // If no images are provided, use a placeholder
   const displayImages = images && images.length > 0 ? images : ['/placeholder.jpg'];
   const mainImage = displayImages[activeIndex];
@@ -52,6 +57,26 @@ export default function PropertyGallery({ images, title, badge, listingType, dic
             {translatedListingType}
           </span>
         </div>
+
+        {propertyId && (
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toggleFavorite(propertyId);
+            }}
+            aria-label={favorited ? "Remove from saved homes" : "Add to saved homes"}
+            className={`absolute top-4 right-4 w-10 h-10 rounded-full backdrop-blur-sm flex items-center justify-center transition-all duration-200 cursor-pointer shadow-sm hover:scale-110 active:scale-95 z-10 ${
+              favorited
+                ? 'bg-mosque text-white'
+                : 'bg-white/90 text-nordic-dark hover:bg-mosque hover:text-white'
+            }`}
+          >
+            <span className="material-icons text-xl">
+              {favorited ? 'favorite' : 'favorite_border'}
+            </span>
+          </button>
+        )}
         
         {displayImages.length > 1 && (
           <button className="absolute bottom-4 right-4 bg-white/90 hover:bg-white text-nordic px-4 py-2 rounded-lg text-sm font-medium shadow-lg backdrop-blur transition-all flex items-center gap-2">

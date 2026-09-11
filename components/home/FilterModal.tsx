@@ -197,14 +197,17 @@ export default function FilterModal({ isOpen, onClose, dictionary }: FilterModal
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-sm font-medium text-gray-900">{dictionary?.filters?.bedrooms || "Bedrooms"}</span>
-                <div className="flex items-center space-x-3 bg-background-light rounded-full p-1">
+                <div className="flex items-center space-x-2 bg-background-light rounded-full p-1">
                   <button 
                     onClick={() => setBeds(Math.max(0, beds - 1))}
-                    className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-500 hover:text-mosque disabled:opacity-50 transition-colors cursor-pointer"
+                    disabled={beds === 0}
+                    className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-500 hover:text-mosque disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
                   >
                     <span className="material-icons text-base">remove</span>
                   </button>
-                  <span className="text-sm font-semibold w-4 text-center">{beds > 0 ? `${beds}+` : (dictionary?.filters?.any || 'Any')}</span>
+                  <span className="text-sm font-semibold min-w-[5.5rem] px-2 text-center select-none text-gray-800 whitespace-nowrap">
+                    {beds > 0 ? `${beds}+` : (dictionary?.filters?.any || 'Any')}
+                  </span>
                   <button 
                     onClick={() => setBeds(beds + 1)}
                     className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-mosque hover:bg-mosque hover:text-white transition-colors cursor-pointer"
@@ -215,14 +218,17 @@ export default function FilterModal({ isOpen, onClose, dictionary }: FilterModal
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm font-medium text-gray-900">{dictionary?.filters?.bathrooms || "Bathrooms"}</span>
-                <div className="flex items-center space-x-3 bg-background-light rounded-full p-1">
+                <div className="flex items-center space-x-2 bg-background-light rounded-full p-1">
                   <button 
                     onClick={() => setBaths(Math.max(0, baths - 1))}
-                    className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-500 hover:text-mosque transition-colors cursor-pointer"
+                    disabled={baths === 0}
+                    className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-500 hover:text-mosque disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
                   >
                     <span className="material-icons text-base">remove</span>
                   </button>
-                  <span className="text-sm font-semibold w-4 text-center">{baths > 0 ? `${baths}+` : (dictionary?.filters?.any || 'Any')}</span>
+                  <span className="text-sm font-semibold min-w-[5.5rem] px-2 text-center select-none text-gray-800 whitespace-nowrap">
+                    {baths > 0 ? `${baths}+` : (dictionary?.filters?.any || 'Any')}
+                  </span>
                   <button 
                     onClick={() => setBaths(baths + 1)}
                     className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-mosque hover:bg-mosque hover:text-white transition-colors cursor-pointer"

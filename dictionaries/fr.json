@@ -64,13 +64,21 @@
     "tabs": {
       "All": "Tout",
       "Buy": "Acheter",
-      "Rent": "Louer"
+      "Rent": "Louer",
+      "Saved": "Enregistrés"
     },
     "no_properties": "Aucune propriété trouvée pour ce filtre.",
     "pagination": {
       "prev": "Préc",
       "next": "Suiv"
     }
+  },
+  "saved": {
+    "title": "Propriétés Enregistrées",
+    "subtitle": "Vos propriétés préférées enregistrées pour consultation ultérieure.",
+    "empty_title": "Aucune propriété enregistrée pour l'instant",
+    "empty_description": "Cliquez sur l'icône de cœur d'une propriété pour l'enregistrer dans vos favoris et la retrouver ici.",
+    "explore_button": "Explorer les Propriétés"
   },
   "featured": {
     "title": "Collections en Vedette",

@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { Property } from '@/types/property';
+import { useFavorites } from '@/context/FavoritesContext';
 
 interface FeaturedCardProps {
   property: Property;
@@ -10,11 +10,13 @@ interface FeaturedCardProps {
 }
 
 export default function FeaturedCard({ property, dictionary }: FeaturedCardProps) {
-  const [isFavorite, setIsFavorite] = useState(false);
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const favorited = isFavorite(property.id);
 
-  const toggleFavorite = (e: React.MouseEvent) => {
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
-    setIsFavorite(!isFavorite);
+    toggleFavorite(property.id);
   };
 
   const badgeKey = property.badge ? `badge_${property.badge.toLowerCase().replace(/\s+/g, '_')}` : '';
@@ -34,16 +36,16 @@ export default function FeaturedCard({ property, dictionary }: FeaturedCardProps
           </div>
         )}
         <button
-          onClick={toggleFavorite}
-          aria-label="Add to saved homes"
-          className={`absolute top-4 right-4 w-10 h-10 rounded-full backdrop-blur-sm flex items-center justify-center transition-all cursor-pointer ${
-            isFavorite
+          onClick={handleFavoriteClick}
+          aria-label={favorited ? "Remove from saved homes" : "Add to saved homes"}
+          className={`absolute top-4 right-4 w-10 h-10 rounded-full backdrop-blur-sm flex items-center justify-center transition-all duration-200 cursor-pointer shadow-sm hover:scale-110 active:scale-95 z-10 ${
+            favorited
               ? 'bg-mosque text-white'
               : 'bg-white/90 text-nordic-dark hover:bg-mosque hover:text-white'
           }`}
         >
           <span className="material-icons text-xl">
-            {isFavorite ? 'favorite' : 'favorite_border'}
+            {favorited ? 'favorite' : 'favorite_border'}
           </span>
         </button>
         <div className="absolute bottom-0 inset-x-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>

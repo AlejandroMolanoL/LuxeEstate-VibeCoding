@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { Property } from '@/types/property';
+import { useFavorites } from '@/context/FavoritesContext';
 
 interface PropertyCardProps {
   property: Property;
@@ -11,11 +11,13 @@ interface PropertyCardProps {
 }
 
 export default function PropertyCard({ property, className = '', dictionary }: PropertyCardProps) {
-  const [isFavorite, setIsFavorite] = useState(false);
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const favorited = isFavorite(property.id);
 
-  const toggleFavorite = (e: React.MouseEvent) => {
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
-    setIsFavorite(!isFavorite);
+    toggleFavorite(property.id);
   };
 
   const isForSale = property.listingType?.toUpperCase() === 'FOR SALE' || property.listingType?.toLowerCase() === 'sale' || property.listingType?.toLowerCase() === 'buy';
@@ -35,16 +37,16 @@ export default function PropertyCard({ property, className = '', dictionary }: P
           src={property.images?.[0] || '/placeholder.jpg'}
         />
         <button
-          onClick={toggleFavorite}
-          aria-label="Add to saved homes"
-          className={`absolute top-3 right-3 w-10 h-10 flex items-center justify-center rounded-full transition-colors cursor-pointer ${
-            isFavorite
+          onClick={handleFavoriteClick}
+          aria-label={favorited ? "Remove from saved homes" : "Add to saved homes"}
+          className={`absolute top-3 right-3 w-10 h-10 flex items-center justify-center rounded-full transition-all duration-200 cursor-pointer shadow-sm hover:scale-110 active:scale-95 z-10 ${
+            favorited
               ? 'bg-mosque text-white'
               : 'bg-white/90 text-nordic-dark hover:bg-mosque hover:text-white'
           }`}
         >
           <span className="material-icons text-lg">
-            {isFavorite ? 'favorite' : 'favorite_border'}
+            {favorited ? 'favorite' : 'favorite_border'}
           </span>
         </button>
         <div

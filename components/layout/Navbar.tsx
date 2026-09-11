@@ -2,9 +2,11 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
+import { useFavorites } from '@/context/FavoritesContext';
+import NotificationPopover from './NotificationPopover';
 
 interface NavbarProps {
   activeTab?: string;
@@ -13,7 +15,7 @@ interface NavbarProps {
   currentLocale?: string;
 }
 
-export default function Navbar({ activeTab = 'Buy', onTabChange, dictionary, currentLocale = 'es' }: NavbarProps) {
+export default function Navbar({ activeTab = '', onTabChange, dictionary, currentLocale = 'es' }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -21,8 +23,22 @@ export default function Navbar({ activeTab = 'Buy', onTabChange, dictionary, cur
   const [isAdmin, setIsAdmin] = useState(false);
   const [currentTab, setCurrentTab] = useState(activeTab);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { favoriteCount } = useFavorites();
   const langMenuRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
+
+  const urlFilter = searchParams ? searchParams.get('filter') : null;
+
+  const isItemActive = (item: string) => {
+    if (urlFilter) {
+      if (item === 'Rent') return urlFilter === 'Rent';
+      if (item === 'Buy') return urlFilter === 'Buy' || urlFilter === 'Sell';
+      if (item === 'Saved Homes') return urlFilter === 'Saved';
+      return false;
+    }
+    return currentTab === item;
+  };
 
   // Subscribe to auth state changes and get initial session
   useEffect(() => {
@@ -88,14 +104,13 @@ export default function Navbar({ activeTab = 'Buy', onTabChange, dictionary, cur
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const navItems = ['Buy', 'Rent', 'Sell', 'Saved Homes'];
+  const navItems = ['Buy', 'Rent', 'Saved Homes'];
 
   const getTranslatedItem = (item: string) => {
     if (!dictionary) return item;
     switch (item) {
       case 'Buy': return dictionary.buy;
       case 'Rent': return dictionary.rent;
-      case 'Sell': return dictionary.sell;
       case 'Saved Homes': return dictionary.saved_homes;
       default: return item;
     }
@@ -106,6 +121,28 @@ export default function Navbar({ activeTab = 'Buy', onTabChange, dictionary, cur
     if (onTabChange) {
       onTabChange(item);
     }
+    if (item === 'Rent') {
+      router.push('/?filter=Rent#propiedades');
+    } else if (item === 'Buy') {
+      router.push('/?filter=Buy#propiedades');
+    } else if (item === 'Saved Homes') {
+      router.push('/?filter=Saved#propiedades');
+    }
+  };
+
+  const renderItemContent = (item: string) => {
+    const label = getTranslatedItem(item);
+    if (item === 'Saved Homes' && favoriteCount > 0) {
+      return (
+        <span className="inline-flex items-center gap-1.5">
+          <span>{label}</span>
+          <span className="px-1.5 py-0.2 text-[10px] font-bold bg-mosque text-white rounded-full leading-tight">
+            {favoriteCount}
+          </span>
+        </span>
+      );
+    }
+    return label;
   };
 
   const handleLanguageChange = (newLocale: string) => {
@@ -151,18 +188,18 @@ export default function Navbar({ activeTab = 'Buy', onTabChange, dictionary, cur
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => {
-              const isActive = currentTab === item;
+              const isActive = isItemActive(item);
               return (
                 <button
                   key={item}
                   onClick={() => handleTabClick(item)}
                   className={
                     isActive
-                      ? 'text-mosque font-medium text-sm border-b-2 border-mosque px-1 py-1 transition-all'
-                      : 'text-nordic-dark/70 hover:text-nordic-dark font-medium text-sm hover:border-b-2 hover:border-nordic-dark/20 px-1 py-1 transition-all'
+                      ? 'text-mosque font-semibold text-sm border-b-2 border-mosque px-1 py-1 transition-all cursor-pointer'
+                      : 'text-nordic-dark/70 hover:text-nordic-dark font-medium text-sm hover:border-b-2 hover:border-nordic-dark/20 px-1 py-1 transition-all cursor-pointer'
                   }
                 >
-                  {getTranslatedItem(item)}
+                  {renderItemContent(item)}
                 </button>
               );
             })}
@@ -215,13 +252,7 @@ export default function Navbar({ activeTab = 'Buy', onTabChange, dictionary, cur
             >
               <span className="material-icons">search</span>
             </button>
-            <button
-              aria-label="Notifications"
-              className="text-nordic-dark hover:text-mosque transition-colors relative"
-            >
-              <span className="material-icons">notifications_none</span>
-              <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-background-light"></span>
-            </button>
+            <NotificationPopover dictionary={dictionary} />
             {user ? (
               <div className="relative" ref={userMenuRef}>
                 <button
@@ -333,7 +364,7 @@ export default function Navbar({ activeTab = 'Buy', onTabChange, dictionary, cur
       {isMobileMenuOpen && (
         <div className="md:hidden border-t border-nordic-dark/5 bg-background-light px-4 py-3 space-y-1">
           {navItems.map((item) => {
-            const isActive = currentTab === item;
+            const isActive = isItemActive(item);
             return (
               <button
                 key={item}
@@ -341,12 +372,12 @@ export default function Navbar({ activeTab = 'Buy', onTabChange, dictionary, cur
                   handleTabClick(item);
                   setIsMobileMenuOpen(false);
                 }}
-                className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-colors ${isActive
-                    ? 'text-mosque bg-mosque/10'
+                className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-colors cursor-pointer ${isActive
+                    ? 'text-mosque bg-mosque/10 font-semibold'
                     : 'text-nordic-dark hover:bg-black/5'
                   }`}
               >
-                {getTranslatedItem(item)}
+                {renderItemContent(item)}
               </button>
             );
           })}

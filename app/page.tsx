@@ -1,3 +1,4 @@
+import { cookies } from 'next/headers';
 import Navbar from '@/components/layout/Navbar';
 import HeroSearch from '@/components/home/HeroSearch';
 import FeaturedCollections from '@/components/home/FeaturedCollections';
@@ -16,11 +17,19 @@ export default async function Home({ searchParams }: HomeProps) {
   const locale = await getLocale();
   const dictionary = await getDictionary(locale);
 
+  const cookieStore = await cookies();
+  const savedCookie = cookieStore.get('luxe_favorites')?.value;
+  const favoriteIds = savedCookie
+    ? decodeURIComponent(savedCookie).split(',').filter(Boolean)
+    : [];
+
   const page = Math.max(1, Number(pageParam) || 1);
 
   const rawFilter = Array.isArray(filterParam) ? filterParam[0] : filterParam;
   const filterType: FilterType =
-    rawFilter === 'Buy' || rawFilter === 'Rent' ? rawFilter : 'All';
+    rawFilter === 'Buy' || rawFilter === 'Rent' || rawFilter === 'Saved' || rawFilter === 'Sell'
+      ? rawFilter
+      : 'All';
 
   const { minPrice, maxPrice, beds, baths, type, location, amenities, title, q, search } = resolvedSearchParams;
 
@@ -37,6 +46,7 @@ export default async function Home({ searchParams }: HomeProps) {
     location: typeof location === 'string' ? location : undefined,
     amenities: typeof amenities === 'string' ? amenities.split(',') : undefined,
     title: titleFilter,
+    favoriteIds,
   };
 
   const [featured, market] = await Promise.all([

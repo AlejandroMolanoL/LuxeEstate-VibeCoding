@@ -64,13 +64,21 @@
     "tabs": {
       "All": "All",
       "Buy": "Buy",
-      "Rent": "Rent"
+      "Rent": "Rent",
+      "Saved": "Saved"
     },
     "no_properties": "No properties found for this filter.",
     "pagination": {
       "prev": "Prev",
       "next": "Next"
     }
+  },
+  "saved": {
+    "title": "Saved Homes",
+    "subtitle": "Your favorite properties saved to review whenever you want.",
+    "empty_title": "No saved homes yet",
+    "empty_description": "Click the heart icon on any property to save it to your favorites and check it here anytime.",
+    "explore_button": "Explore Properties"
   },
   "featured": {
     "title": "Featured Collections",

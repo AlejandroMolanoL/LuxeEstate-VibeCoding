@@ -73,6 +73,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
           {/* Main Content Column */}
           <div className="lg:col-span-8 space-y-8">
             <PropertyGallery 
+              propertyId={property.id}
               images={galleryImages} 
               title={property.title}
               badge={property.badge}

@@ -64,13 +64,21 @@
     "tabs": {
       "All": "Todos",
       "Buy": "Comprar",
-      "Rent": "Alquilar"
+      "Rent": "Alquilar",
+      "Saved": "Guardados"
     },
     "no_properties": "No se encontraron propiedades para este filtro.",
     "pagination": {
       "prev": "Ant",
       "next": "Sig"
     }
+  },
+  "saved": {
+    "title": "Propiedades Guardadas",
+    "subtitle": "Tus propiedades favoritas guardadas para consultar cuando desees.",
+    "empty_title": "No tienes propiedades guardadas",
+    "empty_description": "Haz clic en el icono de corazón en cualquier propiedad para guardarla en tus favoritos y consultarla aquí cuando desees.",
+    "explore_button": "Explorar Propiedades"
   },
   "featured": {
     "title": "Colecciones Destacadas",

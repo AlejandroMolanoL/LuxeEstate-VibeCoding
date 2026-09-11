@@ -1,4 +1,4 @@
-export type PropertyListingType = 'FOR SALE' | 'FOR RENT' | 'SOLD';
+export type PropertyListingType = 'FOR SALE' | 'FOR RENT' | 'SOLD' | 'RENTED';
 export type PropertyCategory = 'House' | 'Apartment' | 'Villa' | 'Penthouse' | 'Commercial';
 
 export interface Property {

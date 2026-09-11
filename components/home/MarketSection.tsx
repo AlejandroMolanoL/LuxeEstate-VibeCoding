@@ -39,21 +39,29 @@ export default function MarketSection({
     return `/?${params.toString()}`;
   }
 
+  const isSavedFilter = filter === 'Saved';
+  const sectionTitle = isSavedFilter 
+    ? (dictionary?.saved?.title || "Saved Homes")
+    : (dictionary?.market?.title || "New in Market");
+  const sectionSubtitle = isSavedFilter
+    ? (dictionary?.saved?.subtitle || "Your favorite properties saved to review whenever you want.")
+    : (dictionary?.market?.subtitle || "Fresh opportunities added this week.");
+
   return (
-    <section>
+    <section id="propiedades">
       <div className="flex items-end justify-between mb-8">
         <div>
           <h2 className="text-2xl font-light text-nordic-dark">
-            {dictionary?.market?.title || "New in Market"}
+            {sectionTitle}
           </h2>
           <p className="text-nordic-muted mt-1 text-sm">
-            {dictionary?.market?.subtitle || "Fresh opportunities added this week."}
+            {sectionSubtitle}
           </p>
         </div>
 
         {/* Filter tabs — Server-side navigation via Link */}
         <div className="hidden md:flex bg-white p-1 rounded-lg">
-          {(['All', 'Buy', 'Rent'] as FilterType[]).map((tab) => {
+          {(['All', 'Buy', 'Rent', 'Saved'] as FilterType[]).map((tab) => {
             const isActive = filter === tab;
             return isActive ? (
               <span
@@ -80,6 +88,25 @@ export default function MarketSection({
           properties.map((property) => (
             <PropertyCard key={property.id} property={property} dictionary={dictionary} />
           ))
+        ) : isSavedFilter ? (
+          <div className="col-span-full py-16 px-4 text-center bg-white rounded-2xl border border-gray-100 shadow-sm max-w-lg mx-auto my-4">
+            <div className="w-16 h-16 rounded-full bg-mosque/10 text-mosque mx-auto flex items-center justify-center mb-4">
+              <span className="material-icons text-3xl">favorite_border</span>
+            </div>
+            <h3 className="text-xl font-semibold text-nordic-dark mb-2">
+              {dictionary?.saved?.empty_title || "No tienes propiedades guardadas"}
+            </h3>
+            <p className="text-nordic-muted text-sm mb-6 max-w-sm mx-auto">
+              {dictionary?.saved?.empty_description || "Haz clic en el icono de corazón en cualquier propiedad para guardarla en tus favoritos y consultarla aquí cuando desees."}
+            </p>
+            <Link
+              href="/?filter=All"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-mosque text-white text-sm font-medium hover:bg-primary-dark transition-all shadow-sm"
+            >
+              <span className="material-icons text-base">explore</span>
+              <span>{dictionary?.saved?.explore_button || "Explorar Propiedades"}</span>
+            </Link>
+          </div>
         ) : (
           <p className="col-span-full text-center text-nordic-muted py-16 text-sm">
             {dictionary?.market?.no_properties || "No properties found for this filter."}

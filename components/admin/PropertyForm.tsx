@@ -404,6 +404,7 @@ export default function PropertyForm({
                       <option value="FOR SALE">{t?.status_for_sale || 'For Sale'}</option>
                       <option value="FOR RENT">{t?.status_for_rent || 'For Rent'}</option>
                       <option value="SOLD">{t?.status_sold || 'Sold'}</option>
+                      <option value="RENTED">{t?.status_rented || 'Rented'}</option>
                     </select>
                   </div>
 

@@ -2,7 +2,8 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { deactivatePropertyAction, reactivatePropertyAction } from '@/app/admin/propiedades/actions';
+import { deactivatePropertyAction, reactivatePropertyAction, updatePropertyListingStatusAction } from '@/app/admin/propiedades/actions';
+import { PropertyListingType } from '@/types/property';
 import PropertyPreviewModal from './PropertyPreviewModal';
 
 export interface PropertyItem {
@@ -18,7 +19,7 @@ export interface PropertyItem {
   baths?: number;
   area?: string;
   images?: string[];
-  listing_type: 'FOR SALE' | 'FOR RENT' | 'SOLD';
+  listing_type: PropertyListingType;
   category?: string;
   created_at?: string;
   parking?: number;
@@ -78,6 +79,17 @@ export default function AdminPropertiesManager({
       alert(res.error || `No se pudo ${action} la propiedad`);
     }
     setIsTogglingId(null);
+  };
+
+  const handleUpdateListingType = async (id: string, title: string, newType: PropertyListingType) => {
+    const res = await updatePropertyListingStatusAction(id, newType);
+    if (res.success) {
+      setPropertiesList((prev) =>
+        prev.map((p) => (p.id === id ? { ...p, listing_type: newType } : p))
+      );
+    } else {
+      alert(res.error || 'No se pudo actualizar el estado de la propiedad');
+    }
   };
 
   // Compute stat totals
@@ -473,24 +485,26 @@ export default function AdminPropertiesManager({
                     )}
                   </div>
 
-                  {/* Status / Listing Type */}
+                  {/* Status / Listing Type Dropdown */}
                   <div className="col-span-6 md:col-span-2">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+                    <select
+                      value={item.listing_type}
+                      onChange={(e) => handleUpdateListingType(item.id, item.title, e.target.value as PropertyListingType)}
+                      className={`text-xs font-semibold px-2.5 py-1 rounded-full border cursor-pointer focus:outline-none transition-all shadow-sm ${
                         item.listing_type === 'FOR SALE'
-                          ? 'bg-hint-green/60 text-mosque border border-mosque/15'
+                          ? 'bg-hint-green/60 text-mosque border-mosque/20'
                           : item.listing_type === 'SOLD'
-                          ? 'bg-gray-100 text-gray-700 border border-gray-200'
-                          : 'bg-amber-50 text-amber-800 border border-amber-200'
+                          ? 'bg-gray-100 text-gray-700 border-gray-300'
+                          : item.listing_type === 'RENTED'
+                          ? 'bg-purple-50 text-purple-700 border-purple-200'
+                          : 'bg-amber-50 text-amber-800 border-amber-200'
                       }`}
                     >
-                      <span
-                        className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
-                          item.listing_type === 'FOR SALE' ? 'bg-mosque' : item.listing_type === 'SOLD' ? 'bg-gray-500' : 'bg-amber-600'
-                        }`}
-                      />
-                      {statusLabel}
-                    </span>
+                      <option value="FOR SALE">En Venta</option>
+                      <option value="FOR RENT">En Alquiler</option>
+                      <option value="SOLD">Vendida</option>
+                      <option value="RENTED">Alquilada</option>
+                    </select>
                   </div>
 
                   {/* Actions */}

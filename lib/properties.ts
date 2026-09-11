@@ -3,7 +3,7 @@ import { Property, PropertyListingType, PropertyCategory } from '@/types/propert
 
 export const PAGE_SIZE = 8;
 
-export type FilterType = 'All' | 'Buy' | 'Rent';
+export type FilterType = 'All' | 'Buy' | 'Rent' | 'Saved' | 'Sell';
 
 export interface AdvancedFilters {
   filter: FilterType;
@@ -15,6 +15,7 @@ export interface AdvancedFilters {
   type?: string;
   location?: string;
   title?: string;
+  favoriteIds?: string[];
 }
 
 interface PropertiesResult {
@@ -63,13 +64,21 @@ export async function getProperties(
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
+  if (filters.filter === 'Saved') {
+    if (!filters.favoriteIds || filters.favoriteIds.length === 0) {
+      return { data: [], count: 0, totalPages: 0 };
+    }
+  }
+
   let query = supabase
     .from('properties')
     .select('*', { count: 'exact' })
     .eq('is_active', true)
     .order('created_at', { ascending: true });
 
-  if (filters.filter === 'Buy') {
+  if (filters.filter === 'Saved') {
+    query = query.in('id', filters.favoriteIds!);
+  } else if (filters.filter === 'Buy' || filters.filter === 'Sell') {
     query = query.eq('listing_type', 'FOR SALE');
   } else if (filters.filter === 'Rent') {
     query = query.eq('listing_type', 'FOR RENT');

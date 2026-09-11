@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   description: "Find your sanctuary. Discover luxury homes, apartments, and exclusive properties.",
 };
 
+import { FavoritesProvider } from "@/context/FavoritesContext";
+import { NotificationProvider } from "@/context/NotificationContext";
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -44,7 +47,11 @@ export default async function RootLayout({
         />
       </head>
       <body className="bg-background-light text-nordic-dark font-display antialiased selection:bg-mosque selection:text-white min-h-full flex flex-col">
-        {children}
+        <FavoritesProvider>
+          <NotificationProvider>
+            {children}
+          </NotificationProvider>
+        </FavoritesProvider>
       </body>
     </html>
   );
