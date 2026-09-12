@@ -56,18 +56,12 @@ export default function Navbar({ activeTab = '', onTabChange, dictionary, curren
 
         if (!error && data?.role === 'admin') {
           setIsAdmin(true);
-        } else if (currentUser.email === 'molanolozanoalejandro@gmail.com') {
-          setIsAdmin(true);
         } else {
           setIsAdmin(false);
         }
       } catch (err) {
         console.error('Error checking admin status:', err);
-        if (currentUser.email === 'molanolozanoalejandro@gmail.com') {
-          setIsAdmin(true);
-        } else {
-          setIsAdmin(false);
-        }
+        setIsAdmin(false);
       }
     };
 

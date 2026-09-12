@@ -77,12 +77,12 @@ export default function AdminUserNav({ currentLocale = 'es', dictionary }: Admin
     user?.email?.split('@')[0] ||
     'Administrador';
 
-  const userEmail = user?.email || 'admin@luxuestate.com';
+  const userEmail = user?.email || '';
 
   const userAvatar =
     user?.user_metadata?.avatar_url ||
     user?.user_metadata?.picture ||
-    'https://avatars.githubusercontent.com/u/69174170?v=4';
+    '';
 
   const flags: Record<string, { flag: string; label: string }> = {
     es: { flag: 'https://flagcdn.com/w20/es.png', label: 'Español' },

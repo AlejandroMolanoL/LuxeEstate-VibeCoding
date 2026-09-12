@@ -28,20 +28,16 @@ export async function proxy(request: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
 
-    // 3. Verify user role
-    const isMasterAdmin = user.email === 'molanolozanoalejandro@gmail.com';
+    // 3. Verify user role directly from Supabase
+    const { data: roleData, error } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .single();
 
-    if (!isMasterAdmin) {
-      const { data: roleData, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .single();
-
-      if (error || roleData?.role !== 'admin') {
-        console.warn(`Unauthorized access attempt to ${pathname} by ${user.email} (ID: ${user.id})`);
-        return NextResponse.redirect(new URL('/', request.url));
-      }
+    if (error || roleData?.role !== 'admin') {
+      console.warn(`Unauthorized access attempt to ${pathname} by ${user.email} (ID: ${user.id})`);
+      return NextResponse.redirect(new URL('/', request.url));
     }
   }
 

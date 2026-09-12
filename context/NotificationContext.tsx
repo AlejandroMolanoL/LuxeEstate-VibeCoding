@@ -45,17 +45,11 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
         if (!error && data?.role === 'admin') {
           setIsAdmin(true);
-        } else if (user.email === 'molanolozanoalejandro@gmail.com') {
-          setIsAdmin(true);
         } else {
           setIsAdmin(false);
         }
       } catch {
-        if (user.email === 'molanolozanoalejandro@gmail.com') {
-          setIsAdmin(true);
-        } else {
-          setIsAdmin(false);
-        }
+        setIsAdmin(false);
       }
     };
 
