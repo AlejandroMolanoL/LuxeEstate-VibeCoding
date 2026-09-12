@@ -146,26 +146,38 @@ export default function AdminUserDirectory({ initialUsers }: AdminUserDirectoryP
     );
 
     try {
-      // 2. Persist to Supabase user_roles
-      const { error } = await supabase
-        .from('user_roles')
-        .upsert(
-          {
-            user_id: user.id,
-            role: newRole,
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: 'user_id' }
-        );
+      // 2. Persist to Supabase user_roles using secure RPC
+      const { error: rpcError } = await supabase.rpc('set_user_role', {
+        target_user_id: user.id,
+        new_role: newRole,
+      });
 
-      if (error) {
-        console.warn('Notice when saving role to Supabase (falling back to local):', error.message);
+      if (rpcError) {
+        // Fallback to direct upsert
+        const { error: upsertError } = await supabase
+          .from('user_roles')
+          .upsert(
+            {
+              user_id: user.id,
+              role: newRole,
+              updated_at: new Date().toISOString(),
+            },
+            { onConflict: 'user_id' }
+          );
+
+        if (upsertError) {
+          throw upsertError;
+        }
       }
 
       setToastMessage(`Rol de ${user.name} actualizado a ${ROLE_LABELS[newRole]}`);
     } catch (err: unknown) {
       console.error('Error updating user role:', err);
-      setToastMessage(`Rol actualizado en interfaz para ${user.name}`);
+      // Revert optimistic update on failure
+      setUsers((prev) =>
+        prev.map((u) => (u.id === user.id ? { ...u, role: user.role } : u))
+      );
+      setToastMessage(`Error al guardar el rol en Supabase.`);
     } finally {
       setIsUpdating(null);
     }
